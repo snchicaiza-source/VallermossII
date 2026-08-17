@@ -95,8 +95,11 @@ $error = $_GET['error'] ?? '';
                         <select id="id_usuario" name="id_usuario" class="form-control" required>
                             <option value="">-- Seleccionar Usuario --</option>
                             <?php foreach ($usuarios as $u): ?>
-                                <option value="<?= $u['id_usuario'] ?>">
-                                    <?= htmlspecialchars(($u['nombres'] ?: $u['usuario']) . ' (' . ($u['puesto_casa'] ?: 'S/N') . ')') ?>
+                                <?php
+                                    $vivienda = !empty($u['numero_vivienda']) ? $u['numero_vivienda'] : 'S/N';
+                                 ?>
+                                 <option value="<?= $u['id_usuario'] ?>">
+                                     <?= htmlspecialchars($u['nombres']) ?> (<?= htmlspecialchars($vivienda) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>

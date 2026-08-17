@@ -20,39 +20,39 @@ $pagosPendientes = $pagoModel->obtenerPendientes();
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar Actualizado con todos los módulos -->
-<aside class="sidebar">
-    <div class="sidebar-header">
-        <h2 class="sidebar-title">Vallermosso II</h2>
-        <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
-    </div>
-    <ul class="nav-menu">
-        <li class="nav-item">
-            <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="activos.php" class="nav-link"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
-        </li>
-        <li class="nav-item">
-            <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
-        </li>
-        <li class="nav-item logout-section">
-            <form action="../../controllers/AuthController.php" method="POST">
-                <input type="hidden" name="action" value="logout">
-                <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-            </form>
-        </li>
-    </ul>
-</aside>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Vallermosso II</h2>
+            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="activos.php" class="nav-link"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
+            </li>
+            <li class="nav-item logout-section">
+                <form action="../../controllers/AuthController.php" method="POST">
+                    <input type="hidden" name="action" value="logout">
+                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
+                </form>
+            </li>
+        </ul>
+    </aside>
 
     <!-- Contenido Principal -->
     <main class="main-content">
@@ -98,35 +98,68 @@ $pagosPendientes = $pagoModel->obtenerPendientes();
                                     <td colspan="6" class="text-center">No hay transferencias pendientes de revisión.</td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($pagosPendientes as $p): ?>
+                                <?php foreach ($pagosPendientes as $pago): ?>
                                     <tr>
+                                        <!-- Residente e Inmueble -->
                                         <td>
-                                            <strong><?= htmlspecialchars($p['nombres']) ?></strong><br>
-                                            <small class="text-muted"><?= htmlspecialchars($p['numero_vivienda'] ?? 'N/A') ?></small>
+                                            <strong>
+                                                <?= htmlspecialchars($pago['nombres'] ?? $pago['usuario_nombre'] ?? 'Usuario Desconocido') ?>
+                                            </strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                Vivienda: <?= htmlspecialchars($pago['numero_vivienda'] ?? 'S/N') ?>
+                                            </small>
                                         </td>
-                                        <td><strong>$<?= number_format($p['monto'], 2) ?></strong></td>
-                                        <td><?= htmlspecialchars($p['concepto']) ?></td>
+
+                                        <!-- Monto -->
                                         <td>
-                                            <?php if (!empty($p['comprobante_url'])): ?>
-                                                <a href="../../public/uploads/<?= htmlspecialchars($p['comprobante_url']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fa-solid fa-paperclip"></i> Ver Imagen
+                                            <strong>$<?= number_format($pago['monto'] ?? 0, 2) ?></strong>
+                                        </td>
+
+                                        <!-- Mes / Concepto -->
+                                        <td>
+                                            <?= htmlspecialchars($pago['concepto'] ?? 'Sin concepto') ?>
+                                        </td>
+
+                                        <!-- Comprobante -->
+                                        <td>
+                                            <?php $archivo = $pago['comprobante_url'] ?? $pago['comprobante'] ?? ''; ?>
+                                            <?php if (!empty($archivo)): ?>
+                                                <a href="../../public/uploads/<?= htmlspecialchars(basename($archivo)) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-paperclip"></i> Ver Imagen
                                                 </a>
                                             <?php else: ?>
                                                 <span class="text-muted">Sin archivo</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= date('d/m/Y H:i', strtotime($p['fecha_registro'])) ?></td>
+
+                                        <!-- Fecha Envío -->
                                         <td>
-                                            <form action="../../controllers/PagoController.php" method="POST" style="display:inline;">
-                                                <input type="hidden" name="action" value="procesar_pago">
-                                                <input type="hidden" name="id_pago" value="<?= $p['id_pago'] ?>">
-                                                <button type="submit" name="estado" value="APROBADO" class="btn btn-sm btn-success">
-                                                    <i class="fa-solid fa-check"></i> Aprobar
-                                                </button>
-                                                <button type="submit" name="estado" value="RECHAZADO" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas rechazar este pago?');">
-                                                    <i class="fa-solid fa-xmark"></i> Rechazar
-                                                </button>
-                                            </form>
+                                            <?php 
+                                                $fechaRaw = $pago['fecha_vencimiento'] ?? $pago['fecha_registro'] ?? '';
+                                                $fechaFormateada = !empty($fechaRaw) ? date('d/m/Y', strtotime($fechaRaw)) : 'N/A';
+                                            ?>
+                                            <?= htmlspecialchars($fechaFormateada) ?>
+                                        </td>
+
+                                        <!-- Acciones -->
+                                        <td>
+                                            <div class="btn-group">
+                                                <form action="../../controllers/PagoController.php" method="POST" style="display:inline-block;">
+                                                    <input type="hidden" name="action" value="aprobar">
+                                                    <input type="hidden" name="id_pago" value="<?= $pago['id_pago'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Aprobar Pago">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="../../controllers/PagoController.php" method="POST" style="display:inline-block;">
+                                                    <input type="hidden" name="action" value="rechazar">
+                                                    <input type="hidden" name="id_pago" value="<?= $pago['id_pago'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Rechazar Pago">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
