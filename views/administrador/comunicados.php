@@ -2,17 +2,11 @@
 session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../models/Comunicado.php';
-require_once __DIR__ . '/../../models/Usuario.php';
-require_once __DIR__ . '/../../services/WhatsAppService.php';
 
 verificarRol(['ADMINISTRADOR', 'DIRECTIVA']);
 
 $comunicadoModel = new Comunicado();
-$historial = $comunicadoModel->obtenerTodos();
-
-$db = Database::connect();
-$stmtUsuarios = $db->query("SELECT nombres, numero_vivienda, telefono_whatsapp, correo FROM usuarios WHERE estado = 'ACTIVO' AND rol = 'RESIDENTE'");
-$residentes = $stmtUsuarios->fetchAll();
+$comunicados = $comunicadoModel->obtenerTodos();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,160 +15,146 @@ $residentes = $stmtUsuarios->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comunicados - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="app-layout">
     <!-- Sidebar -->
-    <div class="sidebar">
-        <h2 class="sidebar-title">Vallermosso II</h2>
-        <p style="font-size: 0.85rem; color: var(--primary); margin-bottom: 20px;">
-            <?= htmlspecialchars($_SESSION['usuario_nombres']) ?> (<?= $_SESSION['usuario_rol'] ?>)
-        </p>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Vallermosso II</h2>
+            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
+        </div>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a href="comunicados.php" class="nav-link active">📢 Comunicados</a>
+                <a href="comunicados.php" class="nav-link active"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
             </li>
             <li class="nav-item">
-                <a href="verificar_pagos.php" class="nav-link">🔍 Verificar Pagos</a>
+                <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
             </li>
-            <li class="nav-item" style="margin-top: 30px;">
+            <li class="nav-item">
+                <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
+            </li>
+            <li class="nav-item logout-section">
                 <form action="../../controllers/AuthController.php" method="POST">
                     <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger" style="width: 100%;">Cerrar Sesión</button>
+                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
                 </form>
             </li>
-            <li class="nav-item">
-                <a href="usuarios.php" class="nav-link">👥 Control de Accesos</a>
-            </li>
         </ul>
-    </div>
+    </aside>
 
     <!-- Contenido Principal -->
-    <div class="main-content">
-        <h1 style="color: var(--primary-dark); margin-bottom: 20px;">📢 Gestión de Comunicados Multicanal</h1>
+    <main class="main-content">
+        <header class="content-header">
+            <h1><i class="fa-solid fa-bullhorn"></i> Gestión de Comunicados y Avisos</h1>
+            <p class="subtitle">Publica boletines, informativos y alertas para la comunidad del condominio.</p>
+        </header>
 
-        <!-- Alertas Flash -->
+        <!-- Mensajes Flash -->
         <?php if (isset($_SESSION['flash_success'])): ?>
             <div class="alert alert-success">
-                <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
+                <i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['flash_error'])): ?>
             <div class="alert alert-danger">
-                <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
+                <i class="fa-solid fa-circle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Formulario de Redacción POST -->
-        <div class="card">
-            <h2 class="card-title">Redactar Nuevo Comunicado</h2>
-            <form action="../../controllers/ComunicadoController.php" method="POST">
-                
-                <div class="form-group">
-                    <label for="titulo">Título del Comunicado:</label>
-                    <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej: Mantenimiento del área comunal" required>
-                </div>
+        <!-- Formulario para Nuevo Comunicado -->
+        <section class="card form-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-pen-to-square"></i> Crear Nuevo Comunicado</h2>
+            </div>
+            <div class="card-body">
+                <form action="../../controllers/ComunicadoController.php" method="POST" class="grid-form">
+                    <input type="hidden" name="action" value="crear_comunicado">
 
-                <div class="form-group">
-                    <label for="mensaje">Mensaje Informativo:</label>
-                    <textarea id="mensaje" name="mensaje" class="form-control" rows="4" placeholder="Escriba aquí los detalles para los residentes..." required></textarea>
-                </div>
+                    <div class="form-group span-full">
+                        <label for="titulo">Título del Comunicado</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Convocatoria a Asamblea General Extraordinaria" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="canal">Canal de Notificación:</label>
-                    <select id="canal" name="canal" class="form-select" required>
-                        <option value="AMBOS">Correo Electrónico + WhatsApp (Recomendado)</option>
-                        <option value="WHATSAPP">Solo WhatsApp Directo</option>
-                        <option value="EMAIL">Solo Correo Electrónico</option>
-                    </select>
-                </div>
+                    <div class="form-group span-full">
+                        <label for="contenido">Detalle / Mensaje</label>
+                        <textarea id="contenido" name="contenido" class="form-control" rows="5" placeholder="Escriba aquí los detalles del aviso..." required></textarea>
+                    </div>
 
-                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                    🚀 Registrar y Enviar Comunicado
-                </button>
-            </form>
-        </div>
+                    <div class="form-group">
+                        <label for="prioridad">Nivel de Prioridad</label>
+                        <select id="prioridad" name="prioridad" class="form-control" required>
+                            <option value="INFORMATIVO">Informativo</option>
+                            <option value="IMPORTANTE">Importante</option>
+                            <option value="URGENTE">Urgente</option>
+                        </select>
+                    </div>
 
-        <!-- Módulo para envío inmediato de WhatsApp a los residentes -->
-        <?php if (isset($_SESSION['ultimo_comunicado'])): 
-            $ultimo = $_SESSION['ultimo_comunicado'];
-            unset($_SESSION['ultimo_comunicado']);
-        ?>
-            <div class="card" style="border: 2px solid var(--accent);">
-                <h2 class="card-title" style="color: var(--accent);">📲 Enviar por WhatsApp a Residentes</h2>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">Haga clic en el botón de cada residente para abrir el chat de WhatsApp con el mensaje cargado automáticamente:</p>
+                    <div class="form-actions span-full">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Publicar y Notificar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
 
+        <!-- Historial de Comunicados -->
+        <section class="card table-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-newspaper"></i> Comunicados Emitidos</h2>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Vivienda</th>
-                                <th>Residente</th>
-                                <th>Teléfono</th>
-                                <th>Acción Directa</th>
+                                <th>Fecha</th>
+                                <th>Título</th>
+                                <th>Prioridad</th>
+                                <th>Publicado por</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($residentes as $residente): 
-                                $urlWa = WhatsAppService::generarEnlaceDirecto($residente['telefono_whatsapp'], $ultimo['titulo'], $ultimo['mensaje']);
-                            ?>
+                            <?php if (empty($comunicados)): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($residente['numero_vivienda']) ?></td>
-                                    <td><?= htmlspecialchars($residente['nombres']) ?></td>
-                                    <td><?= htmlspecialchars($residente['telefono_whatsapp']) ?></td>
-                                    <td>
-                                        <a href="<?= $urlWa ?>" target="_blank" class="btn btn-success" style="font-size: 0.8rem; padding: 6px 12px;">
-                                            💬 Enviar por WhatsApp
-                                        </a>
-                                    </td>
+                                    <td colspan="5" class="text-center">No hay comunicados registrados.</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php foreach ($comunicados as $c): ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y H:i', strtotime($c['fecha_publicacion'])) ?></td>
+                                        <td><strong><?= htmlspecialchars($c['titulo']) ?></strong></td>
+                                        <td>
+                                            <?php if ($c['prioridad'] === 'URGENTE'): ?>
+                                                <span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> URGENTE</span>
+                                            <?php elseif ($c['prioridad'] === 'IMPORTANTE'): ?>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-circle-exclamation"></i> IMPORTANTE</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-info"><i class="fa-solid fa-info-circle"></i> INFORMATIVO</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($c['publicado_por'] ?? 'Administración') ?></td>
+                                        <td>
+                                            <form action="../../controllers/ComunicadoController.php" method="POST" style="display:inline;">
+                                                <input type="hidden" name="action" value="eliminar_comunicado">
+                                                <input type="hidden" name="id_comunicado" value="<?= $c['id_comunicado'] ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Deseas eliminar este comunicado?');">
+                                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-        <?php endif; ?>
-
-        <!-- Historial de Comunicados -->
-        <div class="card">
-            <h2 class="card-title">📋 Historial de Comunicados Emitidos</h2>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Título</th>
-                            <th>Canal</th>
-                            <th>Emitido por</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($historial)): ?>
-                            <tr>
-                                <td colspan="4" style="text-align: center; color: var(--text-muted);">No se han registrado comunicados aún.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($historial as $com): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($com['fecha_envio']) ?></td>
-                                    <td><strong><?= htmlspecialchars($com['titulo']) ?></strong></td>
-                                    <td>
-                                        <span style="background-color: var(--secondary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                                            <?= htmlspecialchars($com['canal']) ?>
-                                        </span>
-                                    </td>
-                                    <td><?= htmlspecialchars($com['remitente']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
+        </section>
+    </main>
 </div>
 
 </body>

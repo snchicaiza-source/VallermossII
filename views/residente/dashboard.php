@@ -2,11 +2,17 @@
 session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../models/Pago.php';
+require_once __DIR__ . '/../../models/Comunicado.php';
 
 verificarRol(['RESIDENTE']);
 
+$id_usuario = $_SESSION['id_usuario'];
+
 $pagoModel = new Pago();
-$pagos = $pagoModel->obtenerPorUsuario($_SESSION['usuario_id']);
+$misPagos = $pagoModel->obtenerPorUsuario($id_usuario);
+
+$comunicadoModel = new Comunicado();
+$comunicados = $comunicadoModel->obtenerTodos();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -15,115 +21,126 @@ $pagos = $pagoModel->obtenerPorUsuario($_SESSION['usuario_id']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Residente - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2 class="sidebar-title">Vallermosso II</h2>
-        <p style="font-size: 0.85rem; color: var(--primary); margin-bottom: 5px;">
-            👋 <?= htmlspecialchars($_SESSION['usuario_nombres']) ?>
-        </p>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
-            🏡 Vivienda: <strong><?= htmlspecialchars($_SESSION['usuario_vivienda']) ?></strong>
-        </p>
+    <!-- Sidebar Residente -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Vallermosso II</h2>
+            <span class="user-badge"><i class="fa-solid fa-house-user"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
+        </div>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a href="dashboard.php" class="nav-link active">💳 Estado de Cuenta</a>
+                <a href="dashboard.php" class="nav-link active"><i class="fa-solid fa-chart-line"></i> <span>Mi Panel</span></a>
             </li>
-            <li class="nav-item" style="margin-top: 30px;">
+            <li class="nav-item logout-section">
                 <form action="../../controllers/AuthController.php" method="POST">
                     <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger" style="width: 100%;">Cerrar Sesión</button>
+                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
                 </form>
             </li>
         </ul>
-    </div>
+    </aside>
 
     <!-- Contenido Principal -->
-    <div class="main-content">
-        <h1 style="color: var(--primary-dark); margin-bottom: 20px;">💳 Portal del Residentes & Copropietarios</h1>
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Bienvenido(a), <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></h1>
+            <p class="subtitle">Consulta los avisos del condominio y reporta tus comprobantes de alícuotas.</p>
+        </header>
 
         <!-- Mensajes Flash -->
         <?php if (isset($_SESSION['flash_success'])): ?>
             <div class="alert alert-success">
-                <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
+                <i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['flash_error'])): ?>
             <div class="alert alert-danger">
-                <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
+                <i class="fa-solid fa-circle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Estado de Cuenta / Alícuotas -->
-        <div class="card">
-            <h2 class="card-title">📌 Mis Obligaciones y Alícuotas</h2>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Vencimiento</th>
-                            <th>Estado</th>
-                            <th>Comprobante</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($pagos)): ?>
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">No registra obligaciones pendientes ni pagos en el sistema.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($pagos as $pago): ?>
-                                <tr>
-                                    <td><strong><?= htmlspecialchars($pago['concepto']) ?></strong></td>
-                                    <td>$<?= number_format($pago['monto'], 2) ?></td>
-                                    <td><?= htmlspecialchars($pago['fecha_vencimiento']) ?></td>
-                                    <td>
-                                        <?php if ($pago['estado'] === 'PAGADO'): ?>
-                                            <span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem;">PAGADO</span>
-                                        <?php elseif ($pago['estado'] === 'EN_REVISION'): ?>
-                                            <span style="background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem;">EN REVISIÓN</span>
-                                        <?php else: ?>
-                                            <span style="background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem;">PENDIENTE</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($pago['estado'] === 'PENDIENTE'): ?>
-                                            <!-- Formulario POST con Multipart para subir Voucher -->
-                                            <form action="../../controllers/ResidenteController.php" method="POST" enctype="multipart/form-data" style="display: flex; gap: 5px; align-items: center;">
-                                                <input type="hidden" name="action" value="subir_comprobante">
-                                                <input type="hidden" name="id_pago" value="<?= $pago['id_pago'] ?>">
-                                                <input type="file" name="comprobante" accept="image/*,.pdf" required style="font-size: 0.75rem; width: 140px;">
-                                                <button type="submit" class="btn btn-primary" style="font-size: 0.75rem; padding: 5px 10px;">Subir</button>
-                                            </form>
-                                        <?php else: ?>
-                                            <small style="color: var(--text-muted);">Comprobante registrado</small>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+        <!-- Sección Subir Comprobante -->
+        <section class="card form-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-upload"></i> Reportar Pago de Alícuota</h2>
             </div>
-        </div>
+            <div class="card-body">
+                <form action="../../controllers/ResidenteController.php" method="POST" enctype="multipart/form-data" class="grid-form">
+                    <input type="hidden" name="action" value="subir_pago">
 
-        <!-- Sección Informativa / Normativas -->
-        <div class="card" style="margin-top: 20px;">
-            <h2 class="card-title">📖 Normativas de Convivencia</h2>
-            <ul style="font-size: 0.9rem; color: var(--text-color); line-height: 1.8; padding-left: 20px;">
-                <li><strong>Horario de Ruido:</strong> Se solicita mantener bajo el nivel de ruido a partir de las 22:00.</li>
-                <li><strong>Mascotas:</strong> El uso de correa en áreas comunales es obligatorio.</li>
-                <li><strong>Pagos de Alícuotas:</strong> Deben realizarse dentro de los primeros 5 días de cada mes.</li>
-            </ul>
-        </div>
+                    <div class="form-group">
+                        <label for="monto">Monto ($)</label>
+                        <input type="number" step="0.01" id="monto" name="monto" class="form-control" placeholder="0.00" required>
+                    </div>
 
-    </div>
+                    <div class="form-group">
+                        <label for="concepto">Concepto / Mes</label>
+                        <input type="text" id="concepto" name="concepto" class="form-control" placeholder="Ej. Alícuota Agosto 2026" required>
+                    </div>
+
+                    <div class="form-group span-full">
+                        <label for="comprobante">Comprobante (Imagen o PDF)</label>
+                        <input type="file" id="comprobante" name="comprobante" class="form-control" accept="image/*,application/pdf" required>
+                    </div>
+
+                    <div class="form-actions span-full">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Registrar Pago</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Historial de Pagos del Residente -->
+        <section class="card table-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-history"></i> Mis Pagos Registrados</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($misPagos)): ?>
+                                <tr>
+                                    <td colspan="4" class="text-center">No has registrado transferencias.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($misPagos as $p): ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y', strtotime($p['fecha_registro'])) ?></td>
+                                        <td><?= htmlspecialchars($p['concepto']) ?></td>
+                                        <td><strong>$<?= number_format($p['monto'], 2) ?></strong></td>
+                                        <td>
+                                            <?php if ($p['estado'] === 'APROBADO'): ?>
+                                                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> APROBADO</span>
+                                            <?php elseif ($p['estado'] === 'RECHAZADO'): ?>
+                                                <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> RECHAZADO</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> PENDIENTE</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
 
 </body>
