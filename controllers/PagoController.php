@@ -1,32 +1,27 @@
 <?php
-// controllers/PagoController.php
 session_start();
 require_once __DIR__ . '/../config/auth_middleware.php';
 require_once __DIR__ . '/../models/Pago.php';
 
-verificarRol(['ADMINISTRADOR', 'DIRECTIVA']);
+verificarRol(['ADMINISTRADOR', 'DIRECTIVA', 'RESIDENTE']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action  = $_POST['action'] ?? '';
-    $id_pago = $_POST['id_pago'] ?? null;
+    $action = $_POST['action'] ?? '';
+    $pagoModel = new Pago();
 
-    if ($id_pago && in_array($action, ['aprobar', 'rechazar'])) {
-        $nuevoEstado = ($action === 'aprobar') ? 'PAGADO' : 'PENDIENTE';
-        
-        $pagoModel = new Pago();
-        $pagoModel->cambiarEstado($id_pago, $nuevoEstado);
+    if ($action === 'procesar_pago') {
+        $id_pago = (int)$_POST['id_pago'];
+        $estado = $_POST['estado']; // APROBADO o RECHAZADO
 
-        if ($action === 'aprobar') {
-            $_SESSION['flash_success'] = "El comprobante ha sido APROBADO correctamente.";
+        $resultado = $pagoModel->actualizarEstado($id_pago, $estado);
+
+        if ($resultado) {
+            $_SESSION['flash_success'] = "El pago #{$id_pago} fue marcado como '{$estado}'.";
         } else {
-            $_SESSION['flash_error'] = "El comprobante fue RECHAZADO y la alícuota volvió a estado PENDIENTE.";
+            $_SESSION['flash_error'] = "No se pudo actualizar el estado del pago.";
         }
-    }
 
-    header("Location: ../views/administrador/verificar_pagos.php");
-    exit();
-} else {
-    header("Location: ../views/administrador/verificar_pagos.php");
-    exit();
+        header('Location: ../views/administrador/verificar_pagos.php');
+        exit();
+    }
 }
-?>
