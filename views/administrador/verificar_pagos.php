@@ -20,30 +20,39 @@ $pagosPendientes = $pagoModel->obtenerPendientes();
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="verificar_pagos.php" class="nav-link active"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
-            </li>
-            <li class="nav-item logout-section">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </aside>
+    <!-- Sidebar Actualizado con todos los módulos -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">Vallermosso II</h2>
+        <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
+    </div>
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="activos.php" class="nav-link"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
+        </li>
+        <li class="nav-item logout-section">
+            <form action="../../controllers/AuthController.php" method="POST">
+                <input type="hidden" name="action" value="logout">
+                <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
+            </form>
+        </li>
+    </ul>
+</aside>
 
     <!-- Contenido Principal -->
     <main class="main-content">

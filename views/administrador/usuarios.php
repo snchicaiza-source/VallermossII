@@ -7,6 +7,9 @@ verificarRol(['ADMINISTRADOR']);
 
 $usuarioModel = new Usuario();
 $usuarios = $usuarioModel->obtenerTodos();
+
+$msg = $_GET['msg'] ?? '';
+$error = $_GET['error'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,11 +23,11 @@ $usuarios = $usuarioModel->obtenerTodos();
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar -->
+    <!-- Sidebar con todos los módulos de navegación -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?> (ADMIN)</span>
+            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
         </div>
         <ul class="nav-menu">
             <li class="nav-item">
@@ -36,6 +39,15 @@ $usuarios = $usuarioModel->obtenerTodos();
             <li class="nav-item">
                 <a href="usuarios.php" class="nav-link active"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
             </li>
+            <li class="nav-item">
+                <a href="activos.php" class="nav-link"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
+            </li>
             <li class="nav-item logout-section">
                 <form action="../../controllers/AuthController.php" method="POST">
                     <input type="hidden" name="action" value="logout">
@@ -45,128 +57,101 @@ $usuarios = $usuarioModel->obtenerTodos();
         </ul>
     </aside>
 
-    <!-- Contenido Principal -->
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-user-lock"></i> Gestión y Control de Accesos</h1>
-            <p class="subtitle">Administra los roles, inmuebles y privilegios del personal y residentes del condominio.</p>
+            <h1><i class="fa-solid fa-shield-halved"></i> Control de Accesos y Usuarios</h1>
+            <p class="subtitle">Gestión de credenciales, asignación de puestos/casas y registro de residentes.</p>
         </header>
 
-        <!-- Mensajes Flash -->
-        <?php if (isset($_SESSION['flash_success'])): ?>
-            <div class="alert alert-success">
-                <i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
-            </div>
+        <?php if ($msg === 'creado'): ?>
+            <div class="alert alert-success"><i class="fa-solid fa-check"></i> Usuario registrado exitosamente.</div>
+        <?php elseif ($error === 'campos_vacios'): ?>
+            <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> Todos los campos marcados son obligatorios.</div>
         <?php endif; ?>
 
-        <?php if (isset($_SESSION['flash_error'])): ?>
-            <div class="alert alert-danger">
-                <i class="fa-solid fa-circle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Formulario de Registro de Usuario -->
-        <section class="card form-card">
+        <!-- Formulario para Registrar Residentes / Directiva -->
+        <section class="card form-card" style="margin-bottom: 2rem;">
             <div class="card-header">
-                <h2><i class="fa-solid fa-user-plus"></i> Registrar Nuevo Usuario</h2>
+                <h2><i class="fa-solid fa-user-plus"></i> Registrar Nuevo Usuario / Residente</h2>
             </div>
             <div class="card-body">
                 <form action="../../controllers/UsuarioController.php" method="POST" class="grid-form">
                     <input type="hidden" name="action" value="crear_usuario">
-                    
+
                     <div class="form-group">
                         <label for="nombres">Nombres Completos</label>
-                        <input type="text" id="nombres" name="nombres" class="form-control" placeholder="Ej. Carlos Pérez" required>
+                        <input type="text" id="nombres" name="nombres" class="form-control" placeholder="Ej. Carlos Mendoza" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="correo">Correo Electrónico</label>
-                        <input type="email" id="correo" name="correo" class="form-control" placeholder="ejemplo@vallermosso.com" required>
+                        <label for="email">Correo Electrónico / Usuario</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="usuario@correo.com" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="rol">Rol Asignado</label>
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="********" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rol">Rol en el Sistema</label>
                         <select id="rol" name="rol" class="form-control" required>
-                            <option value="RESIDENTE">Residente / Copropietario</option>
-                            <option value="DIRECTIVA">Miembro de la Directiva</option>
-                            <option value="ADMINISTRADOR">Administrador de Sistema</option>
+                            <option value="RESIDENTE">RESIDENTE (Copropietario)</option>
+                            <option value="DIRECTIVA">DIRECTIVA</option>
+                            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="numero_vivienda">Inmueble / Vivienda</label>
-                        <input type="text" id="numero_vivienda" name="numero_vivienda" class="form-control" placeholder="Ej. Casa 12 / Dpto 3B">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Contraseña Temporal</label>
-                        <input type="text" id="password" name="password" class="form-control" value="123456" required>
+                        <label for="puesto_casa">Puesto / N° Casa o Dpto</label>
+                        <input type="text" id="puesto_casa" name="puesto_casa" class="form-control" placeholder="Ej. Casa 12 / Dpto 302">
                     </div>
 
                     <div class="form-actions span-full">
-                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Usuario</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-check"></i> Registrar Usuario</button>
                     </div>
                 </form>
             </div>
         </section>
 
-        <!-- Tabla de Usuarios -->
+        <!-- Listado de Usuarios -->
         <section class="card table-card">
             <div class="card-header">
-                <h2><i class="fa-solid fa-address-book"></i> Usuarios Registrados</h2>
+                <h2><i class="fa-solid fa-users"></i> Listado de Usuarios Registrados</h2>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Usuario</th>
-                                <th>Correo Electrónico</th>
+                                <th>Usuario / Nombre</th>
+                                <th>Correo</th>
+                                <th>Puesto / Casa</th>
                                 <th>Rol</th>
-                                <th>Vivienda</th>
                                 <th>Estado</th>
-                                <th>Acción</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($usuarios)): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">No hay usuarios registrados en la base de datos.</td>
+                                    <td colspan="6" class="text-center">No hay usuarios registrados.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($usuarios as $u): ?>
                                     <tr>
-                                        <td><strong><?= htmlspecialchars($u['nombres']) ?></strong></td>
-                                        <td><?= htmlspecialchars($u['correo']) ?></td>
+                                        <td><strong><?= htmlspecialchars($u['nombres'] ?? $u['usuario'] ?? 'N/A') ?></strong></td>
+                                        <td><?= htmlspecialchars($u['email'] ?? 'N/A') ?></td>
+                                        <td><span class="badge badge-info"><?= htmlspecialchars($u['puesto_casa'] ?? 'Sin Asignar') ?></span></td>
+                                        <td><span class="badge badge-info"><?= htmlspecialchars($u['rol'] ?? 'RESIDENTE') ?></span></td>
                                         <td>
-                                            <span class="badge badge-role">
-                                                <?= htmlspecialchars($u['rol']) ?>
+                                            <span class="badge <?= ($u['estado'] ?? 'ACTIVO') === 'ACTIVO' ? 'badge-success' : 'badge-danger' ?>">
+                                                <?= htmlspecialchars($u['estado'] ?? 'ACTIVO') ?>
                                             </span>
                                         </td>
-                                        <td><?= htmlspecialchars($u['numero_vivienda'] ?? 'N/A') ?></td>
                                         <td>
-                                            <?php if ($u['estado'] === 'ACTIVO'): ?>
-                                                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> ACTIVO</span>
-                                            <?php else: ?>
-                                                <span class="badge badge-danger"><i class="fa-solid fa-circle-minus"></i> BLOQUEADO</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <form action="../../controllers/UsuarioController.php" method="POST" style="display:inline;">
-                                                <input type="hidden" name="action" value="cambiar_estado">
-                                                <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
-                                                <?php if ($u['estado'] === 'ACTIVO'): ?>
-                                                    <input type="hidden" name="nuevo_estado" value="BLOQUEADO">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Seguro que deseas bloquear el acceso a este usuario?');">
-                                                        <i class="fa-solid fa-lock"></i> Bloquear
-                                                    </button>
-                                                <?php else: ?>
-                                                    <input type="hidden" name="nuevo_estado" value="ACTIVO">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">
-                                                        <i class="fa-solid fa-lock-open"></i> Activar
-                                                    </button>
-                                                <?php endif; ?>
-                                            </form>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-key"></i> Restablecer</button>
+                                            <button class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-ban"></i> Bloquear</button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

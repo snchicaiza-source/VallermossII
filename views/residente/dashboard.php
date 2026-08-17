@@ -1,18 +1,25 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/auth_middleware.php';
-require_once __DIR__ . '/../../models/Pago.php';
-require_once __DIR__ . '/../../models/Comunicado.php';
 
-verificarRol(['RESIDENTE']);
+// Redirigir si no está autenticado
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: ../../index.php');
+    exit;
+}
+
+require_once __DIR__ . '/../../models/Pago.php';
+require_once __DIR__ . '/../../models/Comunicado.php'; // Agregado
 
 $id_usuario = $_SESSION['id_usuario'];
 
 $pagoModel = new Pago();
-$misPagos = $pagoModel->obtenerPorUsuario($id_usuario);
+$misPagos = $pagoModel->obtenerPorUsuario($id_usuario); // Nombre de variable ajustado a $misPagos
 
 $comunicadoModel = new Comunicado();
 $comunicados = $comunicadoModel->obtenerTodos();
+
+// Evitar avisos de variable no definida para la sesión de nombre
+$nombreUsuario = $_SESSION['nombres'] ?? $_SESSION['usuario_nombres'] ?? 'Residente';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -30,7 +37,7 @@ $comunicados = $comunicadoModel->obtenerTodos();
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-house-user"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
+            <span class="user-badge"><i class="fa-solid fa-house-user"></i> <?= htmlspecialchars($nombreUsuario) ?></span>
         </div>
         <ul class="nav-menu">
             <li class="nav-item">
@@ -48,7 +55,7 @@ $comunicados = $comunicadoModel->obtenerTodos();
     <!-- Contenido Principal -->
     <main class="main-content">
         <header class="content-header">
-            <h1>Bienvenido(a), <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></h1>
+            <h1>Bienvenido(a), <?= htmlspecialchars($nombreUsuario) ?></h1>
             <p class="subtitle">Consulta los avisos del condominio y reporta tus comprobantes de alícuotas.</p>
         </header>
 
@@ -120,13 +127,14 @@ $comunicados = $comunicadoModel->obtenerTodos();
                             <?php else: ?>
                                 <?php foreach ($misPagos as $p): ?>
                                     <tr>
-                                        <td><?= date('d/m/Y', strtotime($p['fecha_registro'])) ?></td>
-                                        <td><?= htmlspecialchars($p['concepto']) ?></td>
-                                        <td><strong>$<?= number_format($p['monto'], 2) ?></strong></td>
+                                        <td><?= isset($p['fecha_registro']) ? date('d/m/Y', strtotime($p['fecha_registro'])) : (isset($p['fecha_pago']) ? date('d/m/Y', strtotime($p['fecha_pago'])) : 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($p['concepto'] ?? 'Sin concepto') ?></td>
+                                        <td><strong>$<?= number_format($p['monto'] ?? 0, 2) ?></strong></td>
                                         <td>
-                                            <?php if ($p['estado'] === 'APROBADO'): ?>
+                                            <?php $estado = $p['estado'] ?? 'PENDIENTE'; ?>
+                                            <?php if ($estado === 'APROBADO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> APROBADO</span>
-                                            <?php elseif ($p['estado'] === 'RECHAZADO'): ?>
+                                            <?php elseif ($estado === 'RECHAZADO'): ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> RECHAZADO</span>
                                             <?php else: ?>
                                                 <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> PENDIENTE</span>

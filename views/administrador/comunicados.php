@@ -20,30 +20,39 @@ $comunicados = $comunicadoModel->obtenerTodos();
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="comunicados.php" class="nav-link active"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
-            </li>
-            <li class="nav-item logout-section">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </aside>
+    <!-- Sidebar Actualizado con todos los módulos -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">Vallermosso II</h2>
+        <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
+    </div>
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="activos.php" class="nav-link"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
+        </li>
+        <li class="nav-item logout-section">
+            <form action="../../controllers/AuthController.php" method="POST">
+                <input type="hidden" name="action" value="logout">
+                <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
+            </form>
+        </li>
+    </ul>
+</aside>
 
     <!-- Contenido Principal -->
     <main class="main-content">
@@ -65,7 +74,7 @@ $comunicados = $comunicadoModel->obtenerTodos();
             </div>
         <?php endif; ?>
 
-        <!-- Formulario para Nuevo Comunicado -->
+        <!-- Formulario para Nuevo Comunicado con Canales de Notificación Dual -->
         <section class="card form-card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-pen-to-square"></i> Crear Nuevo Comunicado</h2>
@@ -74,18 +83,15 @@ $comunicados = $comunicadoModel->obtenerTodos();
                 <form action="../../controllers/ComunicadoController.php" method="POST" class="grid-form">
                     <input type="hidden" name="action" value="crear_comunicado">
 
+                    <!-- Título -->
                     <div class="form-group span-full">
-                        <label for="titulo">Título del Comunicado</label>
+                        <label for="titulo"><strong>Título del Comunicado</strong></label>
                         <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Convocatoria a Asamblea General Extraordinaria" required>
                     </div>
 
-                    <div class="form-group span-full">
-                        <label for="contenido">Detalle / Mensaje</label>
-                        <textarea id="contenido" name="contenido" class="form-control" rows="5" placeholder="Escriba aquí los detalles del aviso..." required></textarea>
-                    </div>
-
+                    <!-- Nivel de Prioridad -->
                     <div class="form-group">
-                        <label for="prioridad">Nivel de Prioridad</label>
+                        <label for="prioridad"><strong>Nivel de Prioridad</strong></label>
                         <select id="prioridad" name="prioridad" class="form-control" required>
                             <option value="INFORMATIVO">Informativo</option>
                             <option value="IMPORTANTE">Importante</option>
@@ -93,6 +99,28 @@ $comunicados = $comunicadoModel->obtenerTodos();
                         </select>
                     </div>
 
+                    <!-- Opciones de Notificación por Correo y WhatsApp -->
+                    <div class="form-group span-full">
+                        <label><strong>Canales de Notificación Masiva:</strong></label>
+                        <div style="display: flex; gap: 20px; margin-top: 8px; flex-wrap: wrap;">
+                            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" name="enviar_email" value="1" checked>
+                                <span><i class="fa-solid fa-envelope" style="color: #0d6efd;"></i> Enviar por Correo Electrónico</span>
+                            </label>
+                            <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" name="enviar_whatsapp" value="1" checked>
+                                <span><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> Enviar por WhatsApp</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje / Detalle -->
+                    <div class="form-group span-full">
+                        <label for="contenido"><strong>Detalle / Mensaje</strong></label>
+                        <textarea id="contenido" name="contenido" class="form-control" rows="5" placeholder="Escriba aquí los detalles del aviso..." required></textarea>
+                    </div>
+
+                    <!-- Botón de Envío -->
                     <div class="form-actions span-full">
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Publicar y Notificar</button>
                     </div>

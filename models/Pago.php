@@ -5,53 +5,50 @@ class Pago {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = Database::conectar();
+        $this->pdo = Database::obtenerConexion();
     }
 
-    public function registrar($id_usuario, $monto, $concepto, $comprobante_url) {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO pagos (id_usuario, monto, concepto, comprobante_url, estado, fecha_registro) 
-            VALUES (:id_usuario, :monto, :concepto, :comprobante_url, 'PENDIENTE', NOW())
-        ");
-        return $stmt->execute([
-            ':id_usuario' => $id_usuario,
-            ':monto' => $monto,
-            ':concepto' => $concepto,
-            ':comprobante_url' => $comprobante_url
-        ]);
-    }
-
+    // Obtener pagos en estado PENDIENTE para auditoría
     public function obtenerPendientes() {
-        $stmt = $this->pdo->prepare("
-            SELECT p.*, u.nombres, u.numero_vivienda 
-            FROM pagos p 
-            INNER JOIN usuarios u ON p.id_usuario = u.id_usuario 
-            WHERE p.estado = 'PENDIENTE' 
-            ORDER BY p.fecha_registro DESC
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT p.*, u.nombres AS usuario_nombre, u.email 
+                    FROM pagos p
+                    LEFT JOIN usuarios u ON p.id_usuario = u.id_usuario
+                    WHERE p.estado = 'PENDIENTE'
+                    ORDER BY p.created_at DESC, p.id_pago DESC";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
+    // Obtener historial completo de pagos
+    public function obtenerTodos() {
+        try {
+            $sql = "SELECT p.*, u.nombres AS usuario_nombre, u.email 
+                    FROM pagos p
+                    LEFT JOIN usuarios u ON p.id_usuario = u.id_usuario
+                    ORDER BY p.created_at DESC, p.id_pago DESC";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+    // Método solicitado por views/residente/dashboard.php
     public function obtenerPorUsuario($id_usuario) {
-        $stmt = $this->pdo->prepare("
-            SELECT * FROM pagos 
-            WHERE id_usuario = :id_usuario 
-            ORDER BY fecha_registro DESC
-        ");
-        $stmt->execute([':id_usuario' => $id_usuario]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function actualizarEstado($id_pago, $estado) {
-        $stmt = $this->pdo->prepare("
-            UPDATE pagos 
-            SET estado = :estado 
-            WHERE id_pago = :id_pago
-        ");
-        return $stmt->execute([
-            ':estado' => $estado,
-            ':id_pago' => $id_pago
-        ]);
+        try {
+            $sql = "SELECT * FROM pagos WHERE id_usuario = :id_usuario ORDER BY fecha_pago DESC";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id_usuario' => $id_usuario]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 }
