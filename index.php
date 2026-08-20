@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Si ya inició sesión, redirigir según su rol
 if (isset($_SESSION['rol']) || isset($_SESSION['usuario_rol'])) {
     $rol = $_SESSION['rol'] ?? $_SESSION['usuario_rol'];
     
@@ -18,7 +17,6 @@ if (isset($_SESSION['rol']) || isset($_SESSION['usuario_rol'])) {
             exit();
     }
 } else {
-    // Si no tiene sesión, enviar al Login
     header("Location: views/auth/login.php");
     exit();
 }

@@ -13,41 +13,31 @@ $misIncidencias = $incidenciaModel->obtenerPorUsuario($_SESSION['id_usuario']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Daños y Quejas - Vallermosso II</title>
+    <title>Reporte de Danos y Quejas - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="app-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-house-user"></i> <?= htmlspecialchars($_SESSION['usuario_nombres']) ?></span>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="dashboard.php" class="nav-link"><i class="fa-solid fa-chart-line"></i> <span>Mi Panel</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="reportar_danos.php" class="nav-link active"><i class="fa-solid fa-screwdriver-wrench"></i> <span>Reporte de Daños / Quejas</span></a>
-            </li>
-            <li class="nav-item logout-section">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </aside>
+    <?php include_once __DIR__ . '/../sidebar.php'; ?>
 
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-wrench"></i> Reporte de Daños y Quejas</h1>
-            <p class="subtitle">Registra eventualidades o sugerencias para la administración del condominio.</p>
+            <h1><i class="fa-solid fa-wrench"></i> Reporte de Danos y Quejas</h1>
+            <p class="subtitle">Registra eventualidades o sugerencias para la administracion del condominio.</p>
         </header>
 
-        <section class="card form-card">
+
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?></div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-danger"><i class="fa-solid fa-circle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?></div>
+        <?php endif; ?>
+
+        <section class="card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-pen"></i> Nuevo Reporte</h2>
             </div>
@@ -58,14 +48,14 @@ $misIncidencias = $incidenciaModel->obtenerPorUsuario($_SESSION['id_usuario']);
                     <div class="form-group">
                         <label for="tipo">Tipo de Incidencia</label>
                         <select id="tipo" name="tipo" class="form-control" required>
-                            <option value="DAÑO">Daño en Áreas Comunes</option>
+                            <option value="DANO">Dano en Areas Comunes</option>
                             <option value="QUEJA">Queja de Convivencia</option>
-                            <option value="RESERVACIÓN">Reserva o Requerimiento</option>
+                            <option value="RESERVACION">Reserva o Requerimiento</option>
                         </select>
                     </div>
 
                     <div class="form-group span-full">
-                        <label for="descripcion">Descripción detallada</label>
+                        <label for="descripcion">Descripcion detallada</label>
                         <textarea id="descripcion" name="descripcion" class="form-control" rows="4" placeholder="Detalla el problema o requerimiento..." required></textarea>
                     </div>
 
@@ -76,7 +66,7 @@ $misIncidencias = $incidenciaModel->obtenerPorUsuario($_SESSION['id_usuario']);
             </div>
         </section>
 
-        <section class="card table-card">
+        <section class="card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-list-check"></i> Estado de mis Reportes</h2>
             </div>
@@ -87,23 +77,39 @@ $misIncidencias = $incidenciaModel->obtenerPorUsuario($_SESSION['id_usuario']);
                             <tr>
                                 <th>Fecha</th>
                                 <th>Tipo</th>
-                                <th>Descripción</th>
+                                <th>Descripcion</th>
                                 <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($misIncidencias)): ?>
                                 <tr>
-                                    <td colspan="4" class="text-center">No has registrado reportes.</td>
+                                    <td colspan="5" class="text-center">No has registrado reportes.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($misIncidencias as $inc): ?>
                                     <tr>
                                         <td><?= date('d/m/Y', strtotime($inc['fecha'])) ?></td>
-                                        <td><strong><?= htmlspecialchars($inc['tipo']) ?></strong></td>
+                                        <td><span class="badge badge-info"><?= htmlspecialchars($inc['tipo']) ?></span></td>
                                         <td><?= htmlspecialchars($inc['descripcion']) ?></td>
                                         <td>
-                                            <span class="badge badge-info"><?= htmlspecialchars($inc['estado'] ?? 'EN REVISIÓN') ?></span>
+                                            <?php $estado = $inc['estado'] ?? 'PENDIENTE'; ?>
+                                            <?php if ($estado === 'RESUELTO'): ?>
+                                                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> RESUELTO</span>
+                                            <?php elseif ($estado === 'EN_REVISION'): ?>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-danger"><i class="fa-solid fa-hourglass"></i> PENDIENTE</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <form action="../../controllers/IncidenciaController.php" method="POST" style="display:inline;" onsubmit="return confirm('Eliminar este reporte?');">
+                                                <input type="hidden" name="action" value="eliminar_incidencia">
+                                                <input type="hidden" name="id_incidencia" value="<?= $inc['id_incidencia'] ?>">
+                                                <input type="hidden" name="return_to" value="reportar_danos">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -116,5 +122,6 @@ $misIncidencias = $incidenciaModel->obtenerPorUsuario($_SESSION['id_usuario']);
     </main>
 </div>
 
+<script src="../../public/js/sidebar.js"></script>
 </body>
 </html>

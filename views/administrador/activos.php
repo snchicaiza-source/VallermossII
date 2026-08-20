@@ -11,8 +11,6 @@ $db = Database::obtenerConexion();
 $stmt = $db->query("SELECT * FROM activos ORDER BY id DESC");
 $activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$msg = $_GET['msg'] ?? '';
-$error = $_GET['error'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,38 +24,7 @@ $error = $_GET['error'] ?? '';
 <body>
 
 <div class="app-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-user-shield"></i> Administrador</span>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="comunicados.php" class="nav-link"><i class="fa-solid fa-bullhorn"></i> <span>Comunicados</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="verificar_pagos.php" class="nav-link"><i class="fa-solid fa-receipt"></i> <span>Auditar Pagos</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="usuarios.php" class="nav-link"><i class="fa-solid fa-users-gear"></i> <span>Control de Accesos</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="activos.php" class="nav-link active"><i class="fa-solid fa-boxes-stacked"></i> <span>Bienes y Activos</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="convenios.php" class="nav-link"><i class="fa-solid fa-handshake"></i> <span>Convenios</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="tramites.php" class="nav-link"><i class="fa-solid fa-folder-open"></i> <span>Trámites</span></a>
-            </li>
-            <li class="nav-item logout-section">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </aside>
+    <?php include_once __DIR__ . '/../sidebar.php'; ?>
 
     <main class="main-content">
         <header class="content-header">
@@ -65,12 +32,13 @@ $error = $_GET['error'] ?? '';
             <p class="subtitle">Control y seguimiento del estado del equipamiento e instalaciones comunitarias.</p>
         </header>
 
-        <?php if ($msg === 'creado'): ?>
-            <div class="alert alert-success"><i class="fa-solid fa-check"></i> Activo registrado con éxito.</div>
-        <?php elseif ($msg === 'eliminado'): ?>
-            <div class="alert alert-success"><i class="fa-solid fa-trash"></i> Registro eliminado correctamente.</div>
-        <?php elseif ($error === 'campos_vacios'): ?>
-            <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> Por favor complete todos los campos requeridos.</div>
+
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?></div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-danger"><i class="fa-solid fa-circle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?></div>
         <?php endif; ?>
 
         <!-- Formulario para Registrar Activos -->
@@ -97,6 +65,11 @@ $error = $_GET['error'] ?? '';
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label for="costo_aproximado">Costo Aproximado ($)</label>
+                        <input type="number" step="0.01" id="costo_aproximado" name="costo_aproximado" class="form-control" placeholder="0.00">
+                    </div>
+
                     <div class="form-actions span-full">
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Activo</button>
                     </div>
@@ -114,9 +87,10 @@ $error = $_GET['error'] ?? '';
                     <table class="table">
                         <thead>
                             <tr>
-                                <th># ID</th>
+                                <th> ID</th>
                                 <th>Nombre / Item</th>
                                 <th>Estado</th>
+                                <th>Costo Aprox.</th>
                                 <th>Fecha Registro</th>
                                 <th>Acciones</th>
                             </tr>
@@ -124,12 +98,12 @@ $error = $_GET['error'] ?? '';
                         <tbody>
                             <?php if (empty($activos)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center">No hay activos o bienes registrados actualmente.</td>
+                                    <td colspan="6" class="text-center">No hay activos o bienes registrados actualmente.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($activos as $act): ?>
                                     <tr>
-                                        <td>#<?= $act['id'] ?></td>
+                                        <td><?= $act['id'] ?></td>
                                         <td><strong><?= htmlspecialchars($act['nombre']) ?></strong></td>
                                         <td>
                                             <?php 
@@ -140,6 +114,7 @@ $error = $_GET['error'] ?? '';
                                             ?>
                                             <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($act['estado']) ?></span>
                                         </td>
+                                        <td>$<?= number_format($act['costo_aproximado'] ?? 0, 2) ?></td>
                                         <td><?= date('d/m/Y H:i', strtotime($act['created_at'])) ?></td>
                                         <td>
                                             <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline-block;" onsubmit="return confirm('¿Confirma eliminar este activo?');">
@@ -159,5 +134,6 @@ $error = $_GET['error'] ?? '';
     </main>
 </div>
 
+<script src="../../public/js/sidebar.js"></script>
 </body>
 </html>

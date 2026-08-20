@@ -15,7 +15,7 @@ class Directiva {
     }
 
     public function obtenerProveedores() {
-        $stmt = $this->db->query("SELECT * FROM proveedores ORDER BY estado_pago DESC");
+        $stmt = $this->db->query("SELECT * FROM proveedores ORDER BY nombre_empresa ASC");
         return $stmt->fetchAll();
     }
 

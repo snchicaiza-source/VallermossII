@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../models/Directiva.php';
 
-// Permitir acceso a DIRECTIVA y ADMINISTRADOR
 verificarRol(['DIRECTIVA', 'ADMINISTRADOR']);
 
 $directivaModel = new Directiva();
@@ -18,123 +17,166 @@ $documentos = $directivaModel->obtenerDocumentos();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Directiva - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="app-layout">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2 class="sidebar-title">Vallermosso II</h2>
-        <p style="font-size: 0.85rem; color: var(--primary); margin-bottom: 20px;">
-            🏛️ <?= htmlspecialchars($_SESSION['usuario_nombres']) ?> (DIRECTIVA)
-        </p>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="dashboard.php" class="nav-link active">📊 Panel Directiva</a>
-            </li>
-            <li class="nav-item">
-                <a href="../administrador/comunicados.php" class="nav-link">📢 Notificaciones</a>
-            </li>
-            <li class="nav-item">
-                <a href="../administrador/verificar_pagos.php" class="nav-link">🔍 Auditar Pagos</a>
-            </li>
-            <li class="nav-item" style="margin-top: 30px;">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger" style="width: 100%;">Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </div>
+    <?php include_once __DIR__ . '/../sidebar.php'; ?>
 
-    <!-- Contenido Principal -->
-    <div class="main-content">
-        <h1 style="color: var(--primary-dark); margin-bottom: 20px;">🏛️ Dashboard de la Directiva</h1>
+    <main class="main-content">
+        <header class="content-header">
+            <h1><i class="fa-solid fa-landmark"></i> Dashboard de la Directiva</h1>
+            <p class="subtitle">Gestion de presupuestos, contrataciones y acervo documental del conjunto.</p>
+        </header>
 
-        <!-- 1. Seguimiento Ejecución Presupuestaria -->
-        <div class="card" style="margin-bottom: 20px;">
-            <h2 class="card-title">📈 Seguimiento de Ejecución Presupuestaria (2026)</h2>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Rubro</th>
-                            <th>Monto Asignado</th>
-                            <th>Monto Ejecutado</th>
-                            <th>Saldo Disponible</th>
-                            <th>% Ejecutado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($presupuestos as $p): 
-                            $saldo = $p['monto_asignado'] - $p['monto_ejecutado'];
-                            $porcentaje = ($p['monto_asignado'] > 0) ? round(($p['monto_ejecutado'] / $p['monto_asignado']) * 100, 1) : 0;
-                        ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($p['rubro']) ?></strong></td>
-                                <td>$<?= number_format($p['monto_asignado'], 2) ?></td>
-                                <td>$<?= number_format($p['monto_ejecutado'], 2) ?></td>
-                                <td>$<?= number_format($saldo, 2) ?></td>
-                                <td>
-                                    <span style="font-weight: bold; color: <?= ($porcentaje > 90) ? '#d9534f' : '#5cb85c' ?>;">
-                                        <?= $porcentaje ?>%
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+
+        <!-- Resumen rapido -->
+        <div class="grid-form" style="margin-bottom: 24px;">
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-body" style="text-align: center;">
+                    <i class="fa-solid fa-wallet" style="font-size: 2rem; color: var(--accent);"></i>
+                    <h3 style="margin: 8px 0 4px; color: var(--primary-dark);">Presupuesto 2026</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Ejecucion activa por rubros</p>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-body" style="text-align: center;">
+                    <i class="fa-solid fa-handshake" style="font-size: 2rem; color: var(--primary);"></i>
+                    <h3 style="margin: 8px 0 4px; color: var(--primary-dark);">Proveedores</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);"><?= count($proveedores) ?> contratados</p>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-body" style="text-align: center;">
+                    <i class="fa-solid fa-folder-tree" style="font-size: 2rem; color: var(--danger);"></i>
+                    <h3 style="margin: 8px 0 4px; color: var(--primary-dark);">Documentos</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Acervo disponible</p>
+                </div>
             </div>
         </div>
 
-        <!-- 2. Estado con Proveedores -->
-        <div class="card" style="margin-bottom: 20px;">
-            <h2 class="card-title">🤝 Estado de Contratación y Proveedores</h2>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Empresa / Proveedor</th>
-                            <th>Servicio / Rubro</th>
-                            <th>Contacto</th>
-                            <th>Monto Contrato</th>
-                            <th>Estado de Pago</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($proveedores as $prov): ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($prov['nombre_empresa']) ?></strong></td>
-                                <td><?= htmlspecialchars($prov['servicio_rubro']) ?></td>
-                                <td><?= htmlspecialchars($prov['contacto']) ?></td>
-                                <td>$<?= number_format($prov['monto_contrato'], 2) ?></td>
-                                <td>
-                                    <?php if ($prov['estado_pago'] === 'AL_DIA'): ?>
-                                        <span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">AL DÍA</span>
-                                    <?php else: ?>
-                                        <span style="background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">PENDIENTE</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+        <!-- Ejecucion Presupuestaria -->
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-chart-line"></i> Seguimiento de Ejecucion Presupuestaria (2026)</h2>
             </div>
-        </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Rubro</th>
+                                <th>Monto Asignado</th>
+                                <th>Monto Ejecutado</th>
+                                <th>Saldo Disponible</th>
+                                <th>% Ejecutado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($presupuestos as $p): 
+                                $saldo = $p['monto_asignado'] - $p['monto_ejecutado'];
+                                $porcentaje = ($p['monto_asignado'] > 0) ? round(($p['monto_ejecutado'] / $p['monto_asignado']) * 100, 1) : 0;
+                            ?>
+                                <tr>
+                                    <td><strong><?= htmlspecialchars($p['rubro']) ?></strong></td>
+                                    <td>$<?= number_format($p['monto_asignado'], 2) ?></td>
+                                    <td>$<?= number_format($p['monto_ejecutado'], 2) ?></td>
+                                    <td>$<?= number_format($saldo, 2) ?></td>
+                                    <td>
+                                        <span class="badge <?= ($porcentaje > 90) ? 'badge-danger' : ($porcentaje >= 50 ? 'badge-warning' : 'badge-success') ?>">
+                                            <?= $porcentaje ?>%
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-        <!-- 3. Documentos, Leyes y Actas -->
-        <div class="card">
-            <h2 class="card-title">📂 Leyes, Actas y Propiedad Horizontal</h2>
-            <ul style="line-height: 2; font-size: 0.95rem; color: var(--text-color);">
-                <li>📜 <strong>Leyes & Reglamento General:</strong> Ley de Propiedad Horizontal Vigente.</li>
-                <li>📝 <strong>Actas de Asamblea:</strong> Acta No. 04 - Asamblea General Ordinaria 2026.</li>
-                <li>🏛️ <strong>Actas de Directiva:</strong> Sesión Extraordinaria de Directiva - Julio 2026.</li>
-                <li>🏢 <strong>Declaratoria de Propiedad Horizontal:</strong> Escritura matriz y alícuotas del conjunto.</li>
-            </ul>
-        </div>
+        <!-- Proveedores -->
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-handshake"></i> Estado de Contratacion y Proveedores</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Empresa / Proveedor</th>
+                                <th>Servicio / Rubro</th>
+                                <th>Contacto</th>
+                                <th>Monto Contrato</th>
+                                <th>Estado de Pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($proveedores as $prov): ?>
+                                <tr>
+                                    <td><strong><?= htmlspecialchars($prov['nombre_empresa']) ?></strong></td>
+                                    <td><?= htmlspecialchars($prov['servicio_rubro']) ?></td>
+                                    <td><?= htmlspecialchars($prov['contacto'] ?? 'N/A') ?></td>
+                                    <td>$<?= number_format($prov['monto_contrato'], 2) ?></td>
+                                    <td>
+                                        <?php if ($prov['estado_pago'] === 'AL_DIA'): ?>
+                                            <span class="badge badge-success">AL DIA</span>
+                                        <?php elseif ($prov['estado_pago'] === 'PENDIENTE'): ?>
+                                            <span class="badge badge-danger">PENDIENTE</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-warning">EN PROCESO</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-    </div>
+        <!-- Documentos -->
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-folder-tree"></i> Leyes, Actas y Propiedad Horizontal</h2>
+            </div>
+            <div class="card-body">
+                <?php if (!empty($documentos)): ?>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th>Titulo</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($documentos as $doc): ?>
+                                    <tr>
+                                        <td><span class="badge badge-info"><?= htmlspecialchars($doc['categoria'] ?? 'Documento') ?></span></td>
+                                        <td><strong><?= htmlspecialchars($doc['titulo']) ?></strong></td>
+                                        <td><?= date('d/m/Y', strtotime($doc['fecha_publicacion'])) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 2.4;">
+                        <li><i class="fa-solid fa-scroll text-primary"></i> <strong>Leyes & Reglamento General:</strong> Ley de Propiedad Horizontal Vigente.</li>
+                        <li><i class="fa-solid fa-file-signature text-primary"></i> <strong>Actas de Asamblea:</strong> Acta No. 04 - Asamblea General Ordinaria 2026.</li>
+                        <li><i class="fa-solid fa-building-user text-primary"></i> <strong>Actas de Directiva:</strong> Sesion Extraordinaria de Directiva - Julio 2026.</li>
+                        <li><i class="fa-solid fa-file-contract text-primary"></i> <strong>Declaratoria:</strong> Escritura matriz y alicuotas del conjunto.</li>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        </section>
+    </main>
 </div>
 
+<script src="../../public/js/sidebar.js"></script>
 </body>
 </html>

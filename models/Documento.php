@@ -10,7 +10,7 @@ class Documento {
 
     public function obtenerTodos() {
         try {
-            $stmt = $this->pdo->query("SELECT * FROM documentos ORDER BY id DESC");
+            $stmt = $this->pdo->query("SELECT * FROM documentos_directiva ORDER BY fecha_publicacion DESC");
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             return [];

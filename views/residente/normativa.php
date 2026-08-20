@@ -1,12 +1,12 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
-require_once __DIR__ . '/../../models/Documento.php';
+require_once __DIR__ . '/../../models/Directiva.php';
 
 verificarRol(['RESIDENTE', 'ADMINISTRADOR', 'DIRECTIVA']);
 
-$docModel = new Documento();
-$documentos = $docModel->obtenerTodos();
+$directivaModel = new Directiva();
+$documentos = $directivaModel->obtenerDocumentos();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,34 +20,16 @@ $documentos = $docModel->obtenerTodos();
 <body>
 
 <div class="app-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Vallermosso II</h2>
-            <span class="user-badge"><i class="fa-solid fa-house-user"></i> <?= htmlspecialchars($_SESSION['usuario_nombres'] ?? 'Residente') ?></span>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="dashboard.php" class="nav-link"><i class="fa-solid fa-chart-line"></i> <span>Mi Panel</span></a>
-            </li>
-            <li class="nav-item">
-                <a href="normativa.php" class="nav-link active"><i class="fa-solid fa-book"></i> <span>Guía y Normativa</span></a>
-            </li>
-            <li class="nav-item logout-section">
-                <form action="../../controllers/AuthController.php" method="POST">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-danger btn-block"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-                </form>
-            </li>
-        </ul>
-    </aside>
+    <?php include_once __DIR__ . '/../sidebar.php'; ?>
 
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-scale-balanced"></i> Guía, Normativa y Repositorio Documental</h1>
+            <h1><i class="fa-solid fa-scale-balanced"></i> Guia, Normativa y Repositorio Documental</h1>
             <p class="subtitle">Leyes, reglamentos internos y actas de asamblea del condominio.</p>
         </header>
 
-        <section class="card table-card">
+
+        <section class="card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-folder-open"></i> Documentos Institucionales</h2>
             </div>
@@ -56,41 +38,32 @@ $documentos = $docModel->obtenerTodos();
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Tipo</th>
-                                <th>Título del Documento</th>
-                                <th>Fecha de Publicación</th>
-                                <th>Acción</th>
+                                <th>Categoria</th>
+                                <th>Titulo del Documento</th>
+                                <th>Archivo</th>
+                                <th>Fecha Publicacion</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($documentos)): ?>
                                 <tr>
-                                    <td><i class="fa-solid fa-file-pdf text-danger"></i> Leyes</td>
-                                    <td><strong>Ley de Propiedad Horizontal y Reglamento General</strong></td>
-                                    <td>Vigente</td>
-                                    <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i> Descargar</button></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fa-solid fa-file-contract text-primary"></i> Reglamentos</td>
-                                    <td><strong>Reglamento Interno de Convivencia - Vallermosso II</strong></td>
-                                    <td>Vigente</td>
-                                    <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i> Descargar</button></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fa-solid fa-file-lines text-warning"></i> Actas</td>
-                                    <td><strong>Acta de Asamblea General de Copropietarios</strong></td>
-                                    <td>Reciente</td>
-                                    <td><button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i> Descargar</button></td>
+                                    <td colspan="3" class="text-center">No hay documentos publicados aun.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($documentos as $d): ?>
                                     <tr>
-                                        <td><strong><?= htmlspecialchars($d['tipo'] ?? 'Documento') ?></strong></td>
-                                        <td><?= htmlspecialchars($d['titulo']) ?></td>
-                                        <td><?= htmlspecialchars($d['fecha'] ?? date('Y-m-d')) ?></td>
+                                        <td><span class="badge badge-info"><?= htmlspecialchars($d['categoria'] ?? $d['tipo'] ?? 'Documento') ?></span></td>
+                                        <td><strong><?= htmlspecialchars($d['titulo']) ?></strong></td>
                                         <td>
-                                            <a href="../../public/uploads/<?= htmlspecialchars($d['archivo'] ?? '#') ?>" class="btn btn-sm btn-outline-primary" download><i class="fa-solid fa-download"></i> Descargar</a>
+                                            <?php if (!empty($d['archivo_url'])): ?>
+                                                <a href="/VallermossoII/<?= htmlspecialchars($d['archivo_url']) ?>" target="_blank" class="btn btn-sm btn-primary">
+                                                    <i class="fa-solid fa-download"></i> Descargar
+                                                </a>
+                                            <?php else: ?>
+                                                <span style="color: var(--text-muted);">-</span>
+                                            <?php endif; ?>
                                         </td>
+                                        <td><?= htmlspecialchars($d['fecha_publicacion'] ?? date('Y-m-d')) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -102,5 +75,6 @@ $documentos = $docModel->obtenerTodos();
     </main>
 </div>
 
+<script src="../../public/js/sidebar.js"></script>
 </body>
 </html>

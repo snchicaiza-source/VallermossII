@@ -26,8 +26,12 @@ class Database {
         return self::$conn;
     }
 
-    // Alias por si usas conectar() en otras partes del código
+    // Alias por si usas conectar() o connect() en otras partes del código
     public static function conectar() {
+        return self::obtenerConexion();
+    }
+
+    public static function connect() {
         return self::obtenerConexion();
     }
 }
