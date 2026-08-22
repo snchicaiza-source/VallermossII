@@ -39,7 +39,7 @@ $documentos = $directivaModel->obtenerDocumentos();
                         <thead>
                             <tr>
                                 <th>Categoria</th>
-                                <th>Titulo del Documento</th>
+                                <th>Título del Documento</th>
                                 <th>Archivo</th>
                                 <th>Fecha Publicacion</th>
                             </tr>
@@ -55,12 +55,13 @@ $documentos = $directivaModel->obtenerDocumentos();
                                         <td><span class="badge badge-info"><?= htmlspecialchars($d['categoria'] ?? $d['tipo'] ?? 'Documento') ?></span></td>
                                         <td><strong><?= htmlspecialchars($d['titulo']) ?></strong></td>
                                         <td>
-                                            <?php if (!empty($d['archivo_url'])): ?>
-                                                <a href="/VallermossoII/<?= htmlspecialchars($d['archivo_url']) ?>" target="_blank" class="btn btn-sm btn-primary">
+                                            <?php $urlDoc = trim((string)($d['archivo_url'] ?? '')); ?>
+                                            <?php if ($urlDoc !== '' && $urlDoc !== '#'): ?>
+                                                <a href="<?= calcularRaizProyecto() ?>/<?= htmlspecialchars($urlDoc) ?>" target="_blank" class="btn btn-sm btn-primary">
                                                     <i class="fa-solid fa-download"></i> Descargar
                                                 </a>
                                             <?php else: ?>
-                                                <span style="color: var(--text-muted);">-</span>
+                                                <span style="color: var(--text-muted);">Sin archivo</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($d['fecha_publicacion'] ?? date('Y-m-d')) ?></td>

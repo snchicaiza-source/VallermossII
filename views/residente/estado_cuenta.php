@@ -12,16 +12,49 @@ $stmt = $pdo->prepare("SELECT * FROM pagos WHERE id_usuario = :id ORDER BY creat
 $stmt->execute([':id' => $id_usuario]);
 $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Recaudaciones registradas por la administracion para este residente
+$stmt = $pdo->prepare("SELECT * FROM recaudaciones WHERE id_usuario = :id ORDER BY fecha_registro DESC");
+$stmt->execute([':id' => $id_usuario]);
+$recaudaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Une ambos origenes en una sola lista con formato comun
+$movimientos = [];
+foreach ($pagos as $p) {
+    $estado = strtoupper($p['estado']);
+    $movimientos[] = [
+        'concepto'  => $p['concepto'],
+        'monto'     => $p['monto'],
+        'fecha_ref' => $p['fecha_vencimiento'] ?? null,
+        'estado'    => $estado === 'PAGADO' ? 'PAGADO' : ($estado === 'EN_REVISION' ? 'EN_REVISION' : ($estado === 'RECHAZADO' ? 'RECHAZADO' : 'PENDIENTE')),
+        'origen'    => 'Pago residente',
+        'fecha_reg' => $p['created_at']
+    ];
+}
+foreach ($recaudaciones as $r) {
+    $estado = strtoupper($r['estado_pago']);
+    $movimientos[] = [
+        'concepto'  => $r['concepto'],
+        'monto'     => $r['monto'],
+        'fecha_ref' => $r['fecha_pago'] ?? null,
+        'estado'    => $estado === 'APROBADO' ? 'PAGADO' : ($estado === 'RECHAZADO' ? 'RECHAZADO' : 'PENDIENTE'),
+        'origen'    => 'Recaudación administración',
+        'fecha_reg' => $r['fecha_registro']
+    ];
+}
+usort($movimientos, function ($a, $b) {
+    return strtotime($b['fecha_reg']) <=> strtotime($a['fecha_reg']);
+});
+
 $totalPendiente = 0;
 $totalPagado = 0;
 $ultimoPago = null;
 
-foreach ($pagos as $p) {
-    if ($p['estado'] === 'PAGADO') {
-        $totalPagado += (float)$p['monto'];
-        if (!$ultimoPago) $ultimoPago = $p;
-    } elseif ($p['estado'] === 'PENDIENTE' || $p['estado'] === 'EN_REVISION') {
-        $totalPendiente += (float)$p['monto'];
+foreach ($movimientos as $m) {
+    if ($m['estado'] === 'PAGADO') {
+        $totalPagado += (float)$m['monto'];
+        if (!$ultimoPago) $ultimoPago = $m;
+    } elseif ($m['estado'] === 'PENDIENTE' || $m['estado'] === 'EN_REVISION') {
+        $totalPendiente += (float)$m['monto'];
     }
 }
 ?>
@@ -69,8 +102,8 @@ foreach ($pagos as $p) {
             <div class="stat-card">
                 <div class="stat-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;"><i class="fa-solid fa-calendar-check"></i></div>
                 <div class="stat-info">
-                    <span class="stat-value"><?= $ultimoPago ? date('d/m/Y', strtotime($ultimoPago['created_at'])) : 'N/A' ?></span>
-                    <span class="stat-label">Ultimo Pago</span>
+                    <span class="stat-value"><?= $ultimoPago ? date('d/m/Y', strtotime($ultimoPago['fecha_reg'])) : 'N/A' ?></span>
+                    <span class="stat-label">Último Pago</span>
                 </div>
             </div>
         </div>
@@ -86,33 +119,32 @@ foreach ($pagos as $p) {
                             <tr>
                                 <th>Concepto</th>
                                 <th>Monto</th>
-                                <th>Vencimiento</th>
+                                <th>Fecha</th>
                                 <th>Estado</th>
-                                <th>Registrado</th>
+                                <th>Origen</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (empty($pagos)): ?>
+                            <?php if (empty($movimientos)): ?>
                                 <tr><td colspan="5" class="text-center">No hay pagos registrados.</td></tr>
                             <?php else: ?>
-                                <?php foreach ($pagos as $p): ?>
+                                <?php foreach ($movimientos as $m): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($p['concepto'] ?? 'N/A') ?></td>
-                                        <td><strong>$<?= number_format($p['monto'], 2) ?></strong></td>
-                                        <td><?= $p['fecha_vencimiento'] ? date('d/m/Y', strtotime($p['fecha_vencimiento'])) : 'N/A' ?></td>
+                                        <td><?= htmlspecialchars($m['concepto'] ?? 'N/A') ?></td>
+                                        <td><strong>$<?= number_format($m['monto'], 2) ?></strong></td>
+                                        <td><?= $m['fecha_ref'] ? date('d/m/Y', strtotime($m['fecha_ref'])) : 'N/A' ?></td>
                                         <td>
-                                            <?php $est = $p['estado']; ?>
-                                            <?php if ($est === 'PAGADO'): ?>
+                                            <?php if ($m['estado'] === 'PAGADO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> PAGADO</span>
-                                            <?php elseif ($est === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
-                                            <?php elseif ($est === 'RECHAZADO'): ?>
+                                            <?php elseif ($m['estado'] === 'EN_REVISION'): ?>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISIÓN</span>
+                                            <?php elseif ($m['estado'] === 'RECHAZADO'): ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> RECHAZADO</span>
                                             <?php else: ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-hourglass"></i> PENDIENTE</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= date('d/m/Y', strtotime($p['created_at'])) ?></td>
+                                        <td><?= htmlspecialchars($m['origen']) ?><br><small class="text-muted"><?= date('d/m/Y', strtotime($m['fecha_reg'])) ?></small></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>

@@ -13,6 +13,7 @@ $mensaje = $_GET['msg'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil del Residente - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/tablas.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -23,7 +24,7 @@ $mensaje = $_GET['msg'] ?? '';
     <main class="main-content">
         <header class="content-header">
             <h1><i class="fa-solid fa-id-card"></i> Perfil y Datos del Residente</h1>
-            <p class="subtitle">Actualizacion de datos personales y aceptacion del reglamento de uso.</p>
+            <p class="subtitle">Actualización de datos personales y aceptación del reglamento de uso.</p>
         </header>
 
 
@@ -53,19 +54,19 @@ $mensaje = $_GET['msg'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label for="correo">Correo Electronico</label>
+                        <label for="correo">Correo Electrónico</label>
                         <input type="email" id="correo" name="correo" class="form-control" value="<?= htmlspecialchars($_SESSION['correo'] ?? $_SESSION['usuario_correo'] ?? '') ?>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="telefono_whatsapp">Telefono / WhatsApp</label>
-                        <input type="text" id="telefono_whatsapp" name="telefono_whatsapp" class="form-control" placeholder="09XXXXXXXX" value="<?= htmlspecialchars($_SESSION['telefono'] ?? $_SESSION['usuario_telefono'] ?? '') ?>">
+                        <label for="telefono_whatsapp">Teléfono / WhatsApp</label>
+                        <input type="tel" id="telefono_whatsapp" name="telefono_whatsapp" class="form-control" placeholder="Ej. 0987654321" maxlength="13" inputmode="tel" data-validar="telefono" data-solo-digitos="13" data-permite-mas value="<?= htmlspecialchars($_SESSION['telefono'] ?? $_SESSION['usuario_telefono'] ?? '') ?>">
                     </div>
 
                     <div class="form-group span-full">
                         <label class="checkbox-container">
                             <input type="checkbox" name="aceptacion_terminos" value="1" required checked>
-                            <span>Declaro haber leido y aceptado las normas de convivencia y reglamentos de uso de areas comunes del conjunto Vallermosso II.</span>
+                            <span>Declaro haber leído y aceptado las normas de convivencia y reglamentos de uso de áreas comunes del conjunto Vallermosso II.</span>
                         </label>
                     </div>
 
@@ -75,9 +76,59 @@ $mensaje = $_GET['msg'] ?? '';
                 </form>
             </div>
         </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-key"></i> Cambiar Mi Contraseña</h2>
+            </div>
+            <div class="card-body">
+                <form action="../../controllers/UsuarioController.php" method="POST" class="grid-form">
+                    <input type="hidden" name="action" value="cambiar_clave_propia">
+
+                    <div class="form-group span-full">
+                        <label for="clave_actual">Contraseña actual *</label>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="password" id="clave_actual" name="clave_actual" class="form-control" required>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="alternarVer('clave_actual', this)"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nueva_clave">Nueva contraseña (min. 6 caracteres) *</label>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="password" id="nueva_clave" name="nueva_clave" class="form-control" required minlength="6">
+                            <button type="button" class="btn btn-sm btn-outline" onclick="alternarVer('nueva_clave', this)"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmar_clave">Confirmar nueva contraseña *</label>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="password" id="confirmar_clave" name="confirmar_clave" class="form-control" required minlength="6">
+                            <button type="button" class="btn btn-sm btn-outline" onclick="alternarVer('confirmar_clave', this)"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions span-full">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-key"></i> Actualizar Contraseña</button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </main>
 </div>
 
+<script>
+function alternarVer(idInput, btn) {
+    var input = document.getElementById(idInput);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    var icono = btn.querySelector('i');
+    if (icono) icono.className = input.type === 'text' ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+}
+</script>
+
 <script src="../../public/js/sidebar.js"></script>
+<script src="../../public/js/tablas.js?v=3"></script>
 </body>
 </html>

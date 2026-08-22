@@ -12,6 +12,18 @@ $stmt = $pdo->prepare("SELECT * FROM reservas WHERE id_usuario = :id ORDER BY fe
 $stmt->execute([':id' => $id_usuario]);
 $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Crea la tabla 'espacios' si no existe (evita el error 500)
+try {
+    $pdo->query("SELECT 1 FROM espacios LIMIT 1");
+} catch (PDOException $e) {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS espacios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(100) NOT NULL UNIQUE,
+        activo TINYINT(1) NOT NULL DEFAULT 1,
+        creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
 $espaciosStmt = $pdo->query("SELECT nombre FROM espacios WHERE activo = 1 ORDER BY nombre");
 $espaciosDisponibles = $espaciosStmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
@@ -46,7 +58,7 @@ $espaciosDisponibles = $espaciosStmt->fetchAll(PDO::FETCH_COLUMN);
                 <h2><i class="fa-solid fa-plus-circle"></i> Nueva Reserva</h2>
             </div>
             <div class="card-body">
-                <form action="../../controllers/ResidenteController.php" method="POST" class="grid-form">
+                <form action="../../controllers/ResidenteController.php" method="POST" class="grid-form" id="formReserva">
                     <input type="hidden" name="action" value="crear_reserva">
 
                     <div class="form-group">
@@ -66,7 +78,7 @@ $espaciosDisponibles = $espaciosStmt->fetchAll(PDO::FETCH_COLUMN);
 
                     <div class="form-group">
                         <label for="fecha_reserva">Fecha</label>
-                        <input type="date" id="fecha_reserva" name="fecha_reserva" class="form-control" required>
+                        <input type="date" id="fecha_reserva" name="fecha_reserva" class="form-control" min="<?= date('Y-m-d') ?>" required>
                     </div>
 
                     <div class="form-group">
@@ -88,6 +100,28 @@ $espaciosDisponibles = $espaciosStmt->fetchAll(PDO::FETCH_COLUMN);
                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-calendar-check"></i> Reservar</button>
                     </div>
                 </form>
+                <script>
+                (function() {
+                    var form = document.getElementById('formReserva');
+                    if (!form) return;
+                    form.addEventListener('submit', function(e) {
+                        var fecha = document.getElementById('fecha_reserva').value;
+                        var inicio = document.getElementById('hora_inicio').value;
+                        var fin = document.getElementById('hora_fin').value;
+                        var hoy = new Date();
+                        hoy.setHours(0, 0, 0, 0);
+                        if (fecha && new Date(fecha + 'T00:00:00') < hoy) {
+                            e.preventDefault();
+                            alert('No puedes reservar en fechas pasadas.');
+                            return;
+                        }
+                        if (inicio && fin && fin <= inicio) {
+                            e.preventDefault();
+                            alert('La hora de fin debe ser posterior a la hora de inicio.');
+                        }
+                    });
+                })();
+                </script>
             </div>
         </section>
 

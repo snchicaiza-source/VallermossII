@@ -16,7 +16,7 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentacion Legal - Vallermosso II</title>
+    <title>Documentación Legal - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -25,8 +25,8 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include_once __DIR__ . '/../sidebar.php'; ?>
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-scale-balanced"></i> Documentacion Legal</h1>
-            <p class="subtitle">Gestion y carga de documentos oficiales del conjunto residencial.</p>
+            <h1><i class="fa-solid fa-scale-balanced"></i> Documentación Legal</h1>
+            <p class="subtitle">Gestión y carga de documentos oficiales del conjunto residencial.</p>
         </header>
 
 
@@ -47,7 +47,7 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" name="action" value="crear_documento_legal">
 
                     <div class="form-group">
-                        <label for="titulo">Titulo del Documento</label>
+                        <label for="titulo">Título del Documento</label>
                         <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Acta Asamblea General 2026" required>
                     </div>
 
@@ -64,7 +64,7 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="form-group">
                         <label for="archivo"><i class="fa-solid fa-paperclip"></i> Seleccionar Archivo (PDF, imagen, etc.)</label>
                         <input type="file" id="archivo" name="archivo" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif" required>
-                        <small style="color: var(--text-muted);">Formatos aceptados: PDF, Word, Excel, imagenes. Maximo 10MB.</small>
+                        <small style="color: var(--text-muted);">Formatos aceptados: PDF, Word, Excel, imagenes. Máximo 10MB.</small>
                     </div>
 
                     <div class="form-group">
@@ -88,7 +88,7 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Titulo</th>
+                                <th>Título</th>
                                 <th>Categoria</th>
                                 <th>Archivo</th>
                                 <th>Fecha Publicacion</th>
@@ -126,8 +126,8 @@ $documentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?= date('d/m/Y', strtotime($doc['fecha_publicacion'])) ?></td>
                                         <td>
                                             <?php if (!empty($doc['archivo_url'])): ?>
-                                                <a href="../../<?= htmlspecialchars($doc['archivo_url']) ?>" target="_blank" class="btn btn-sm btn-outline" title="Ver documento">
-                                                    <i class="fa-solid fa-eye"></i>
+                                                <a href="../../<?= htmlspecialchars($doc['archivo_url']) ?>" download class="btn btn-sm btn-outline" title="Descargar archivo">
+                                                    <i class="fa-solid fa-download"></i> Descargar
                                                 </a>
                                             <?php endif; ?>
                                             <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline;" onsubmit="return confirm('Eliminar este documento?');">

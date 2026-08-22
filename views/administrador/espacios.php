@@ -6,6 +6,19 @@ require_once __DIR__ . '/../../config/db.php';
 verificarRol(['ADMINISTRADOR']);
 
 $db = Database::obtenerConexion();
+
+// Crea la tabla 'espacios' si no existe en la base de datos (evita el error 500)
+try {
+    $db->query("SELECT 1 FROM espacios LIMIT 1");
+} catch (PDOException $e) {
+    $db->exec("CREATE TABLE IF NOT EXISTS espacios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(100) NOT NULL UNIQUE,
+        activo TINYINT(1) NOT NULL DEFAULT 1,
+        creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
 $espacios = $db->query("SELECT * FROM espacios ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

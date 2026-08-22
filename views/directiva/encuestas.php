@@ -24,7 +24,7 @@ $encuestas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include_once __DIR__ . '/../sidebar.php'; ?>
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-square-poll-vertical"></i> Gestion de Encuestas</h1>
+            <h1><i class="fa-solid fa-square-poll-vertical"></i> Gestión de Encuestas</h1>
             <p class="subtitle">Crear y administrar encuestas comunitarias.</p>
         </header>
 
@@ -45,26 +45,26 @@ $encuestas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" name="action" value="crear_encuesta">
 
                     <div class="form-group">
-                        <label for="titulo">Titulo de la Encuesta</label>
+                        <label for="titulo">Título de la Encuesta</label>
                         <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Preferencia de horario para asamblea" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="descripcion">Descripcion (opcional)</label>
+                        <label for="descripcion">Descripción (opcional)</label>
                         <textarea id="descripcion" name="descripcion" class="form-control" rows="2" placeholder="Detalle breve de la encuesta..."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label>Opciones de Respuesta (minimo 2)</label>
+                        <label>Opciones de Respuesta (mínimo 2)</label>
                         <div id="opcionesContainer">
                             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                                <input type="text" name="opciones[]" class="form-control" placeholder="Opcion 1" required>
+                                <input type="text" name="opciones[]" class="form-control" placeholder="Opción 1" required>
                             </div>
                             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                                <input type="text" name="opciones[]" class="form-control" placeholder="Opcion 2" required>
+                                <input type="text" name="opciones[]" class="form-control" placeholder="Opción 2" required>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="agregarOpcion()"><i class="fa-solid fa-plus"></i> Agregar Opcion</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="agregarOpcion()"><i class="fa-solid fa-plus"></i> Agregar Opción</button>
                     </div>
 
                     <div class="form-group">
@@ -88,7 +88,7 @@ $encuestas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Titulo</th>
+                                <th>Título</th>
                                 <th>Opciones</th>
                                 <th>Votos</th>
                                 <th>Estado</th>
@@ -154,7 +154,7 @@ function agregarOpcion() {
     var count = container.querySelectorAll('input').length + 1;
     var div = document.createElement('div');
     div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px;';
-    div.innerHTML = '<input type="text" name="opciones[]" class="form-control" placeholder="Opcion ' + count + '" required><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()"><i class="fa-solid fa-times"></i></button>';
+    div.innerHTML = '<input type="text" name="opciones[]" class="form-control" placeholder="Opción ' + count + '" required><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()"><i class="fa-solid fa-times"></i></button>';
     container.appendChild(div);
 }
 </script>

@@ -19,6 +19,7 @@ $activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienes y Activos - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/tablas.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -83,8 +84,27 @@ $activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2><i class="fa-solid fa-list-check"></i> Listado de Activos Registrados</h2>
             </div>
             <div class="card-body">
+                <div class="tabla-toolbar">
+                    <div class="filtro-grupo">
+                        <span class="filtro-etiqueta">Buscar</span>
+                        <div class="buscador-tabla">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" data-buscar="tablaActivos" placeholder="Buscar activo por nombre o estado...">
+                        </div>
+                    </div>
+                    <div class="filtro-grupo">
+                        <span class="filtro-etiqueta">Estado</span>
+                        <select class="filtro-tabla" data-filtro-tabla="tablaActivos" data-filtro-col="2">
+                            <option value="">Todos los estados</option>
+                            <option value="EXCELENTE">Excelente</option>
+                            <option value="BUENO">Bueno</option>
+                            <option value="REGULAR">Regular</option>
+                            <option value="MALO">Malo</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="tablaActivos" data-por-pagina="10">
                         <thead>
                             <tr>
                                 <th> ID</th>
@@ -135,5 +155,6 @@ $activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script src="../../public/js/sidebar.js"></script>
+<script src="../../public/js/tablas.js?v=3"></script>
 </body>
 </html>

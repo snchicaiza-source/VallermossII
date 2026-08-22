@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Redireccionador limpio de WhatsApp: /ws/CODIGO -> ws.php?c=CODIGO
+RewriteRule ^ws/([a-zA-Z0-9_-]+)/?$ ws.php?c=$1 [L,QSA]
+
 # Proteger directorios sensibles (solo GET)
 RewriteCond %{REQUEST_METHOD} =GET
 RewriteRule ^(config|models|services)/ - [F,L]

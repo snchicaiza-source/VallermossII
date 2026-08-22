@@ -107,7 +107,7 @@ if (isset($_GET['id_usuario']) && $_GET['id_usuario'] > 0) {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div>
                         <p><strong>Residente:</strong> <?= htmlspecialchars($usuarioSeleccionado['nombres']) ?></p>
-                        <p><strong>Cedula:</strong> <?= htmlspecialchars($usuarioSeleccionado['cedula'] ?? 'N/A') ?></p>
+                        <p><strong>Cédula:</strong> <?= htmlspecialchars($usuarioSeleccionado['cedula'] ?? 'N/A') ?></p>
                     </div>
                     <div>
                         <p><strong>Vivienda:</strong> <?= htmlspecialchars($numVivienda) ?></p>
@@ -125,7 +125,7 @@ if (isset($_GET['id_usuario']) && $_GET['id_usuario'] > 0) {
                         <h3 style="color: var(--danger, #dc3545);">$<?= number_format($totalPendiente, 2) ?></h3>
                     </div>
                     <div style="text-align: center;">
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">Alicuota</p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Alícuota</p>
                         <h3 style="color: var(--primary, #4a6cf7);"><?= htmlspecialchars($usuarioSeleccionado['alicuota'] ?? 'N/A') ?></h3>
                     </div>
                 </div>

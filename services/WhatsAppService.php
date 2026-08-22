@@ -81,6 +81,55 @@ class WhatsAppService {
         return "https://wa.me/" . $telefonoLimpio . "?text=" . $textoUrl;
     }
 
+    /**
+     * Registra el mensaje en la BD con un codigo corto y devuelve una URL limpia
+     * tipo https://midominio.com/ws/vmX7k2 en lugar del enlace largo de wa.me.
+     * Si la BD falla, devuelve el enlace directo clasico como respaldo.
+     */
+    public static function registrarEnlaceLimpio($telefono, $titulo, $mensaje) {
+        $enlaceDirecto = self::generarEnlaceDirecto($telefono, $titulo, $mensaje);
+
+        try {
+            require_once __DIR__ . '/../config/db.php';
+            $pdo = Database::obtenerConexion();
+
+            $pdo->exec("CREATE TABLE IF NOT EXISTS enlaces_whatsapp (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                codigo VARCHAR(32) NOT NULL UNIQUE,
+                telefono VARCHAR(20) NOT NULL,
+                mensaje TEXT,
+                activo TINYINT(1) DEFAULT 1,
+                creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+            $telefonoLimpio = self::formatearTelefono($telefono);
+            $texto = "VALLERMOSSO II\n\n" . $titulo . "\n\n" . $mensaje;
+
+            // Genera un codigo corto unico (vm + 6 caracteres)
+            $stmtDup = $pdo->prepare("SELECT COUNT(*) FROM enlaces_whatsapp WHERE codigo = :c");
+            do {
+                $codigo = 'vm' . substr(bin2hex(random_bytes(4)), 0, 6);
+                $stmtDup->execute([':c' => $codigo]);
+            } while ((int)$stmtDup->fetchColumn() > 0);
+
+            $pdo->prepare("INSERT INTO enlaces_whatsapp (codigo, telefono, mensaje) VALUES (:c, :t, :m)")
+                ->execute([':c' => $codigo, ':t' => $telefonoLimpio, ':m' => $texto]);
+
+            // Construye la URL base del proyecto sin importar desde donde se llame
+            $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+            if (str_ends_with($scriptDir, '/controllers')) {
+                $scriptDir = substr($scriptDir, 0, -strlen('/controllers'));
+            }
+            $esquema = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+            return $esquema . '://' . $host . $scriptDir . '/ws/' . $codigo;
+
+        } catch (PDOException $e) {
+            return $enlaceDirecto;
+        }
+    }
+
     public static function notificarResidente($telefono, $asunto, $mensaje) {
         return self::enviarMensaje($telefono, $asunto . "\n\n" . $mensaje);
     }

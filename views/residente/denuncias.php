@@ -2,11 +2,13 @@
 session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../models/Incidencia.php';
 
 verificarRol(['RESIDENTE']);
 
 $id_usuario = $_SESSION['id_usuario'];
 $pdo = Database::obtenerConexion();
+Incidencia::asegurarTabla();
 
 $stmt = $pdo->prepare("SELECT * FROM incidencias WHERE id_usuario = :id AND tipo = 'QUEJA' ORDER BY fecha DESC");
 $stmt->execute([':id' => $id_usuario]);
@@ -50,7 +52,7 @@ $denuncias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="form-group">
                         <label for="tipo">Tipo</label>
                         <select id="tipo" name="tipo" class="form-control" required>
-                            <option value="">Seleccione una opcion</option>
+                            <option value="">Seleccione una opción</option>
                             <option value="RUIDO">Ruido</option>
                             <option value="MASCOTAS">Mascotas</option>
                             <option value="VECINOS">Problemas con Vecinos</option>
@@ -59,7 +61,7 @@ $denuncias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="form-group span-full">
-                        <label for="descripcion">Descripcion</label>
+                        <label for="descripcion">Descripción</label>
                         <textarea id="descripcion" name="descripcion" class="form-control" rows="5" placeholder="Describe el problema de convivencia con el mayor detalle posible..." required></textarea>
                     </div>
 
@@ -81,7 +83,7 @@ $denuncias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tr>
                                 <th>Fecha</th>
                                 <th>Tipo</th>
-                                <th>Descripcion</th>
+                                <th>Descripción</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -100,7 +102,7 @@ $denuncias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?php if ($est === 'RESUELTO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> RESUELTO</span>
                                             <?php elseif ($est === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISIÓN</span>
                                             <?php else: ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-hourglass"></i> PENDIENTE</span>
                                             <?php endif; ?>
@@ -108,7 +110,7 @@ $denuncias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td>
                                             <form action="../../controllers/IncidenciaController.php" method="POST" style="display:inline;" onsubmit="return confirm('Eliminar esta denuncia?');">
                                                 <input type="hidden" name="action" value="eliminar_incidencia">
-                                                <input type="hidden" name="id_incidencia" value="<?= $d['id_incidencia'] ?>">
+                                                <input type="hidden" name="id_incidencia" value="<?= $d['id'] ?>">
                                                 <input type="hidden" name="return_to" value="denuncias">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
                                             </form>

@@ -27,7 +27,7 @@ $documentos = $directivaModel->obtenerDocumentos();
     <main class="main-content">
         <header class="content-header">
             <h1><i class="fa-solid fa-landmark"></i> Dashboard de la Directiva</h1>
-            <p class="subtitle">Gestion de presupuestos, contrataciones y acervo documental del conjunto.</p>
+            <p class="subtitle">Gestión de presupuestos, contrataciones y acervo documental del conjunto.</p>
         </header>
 
 
@@ -37,7 +37,7 @@ $documentos = $directivaModel->obtenerDocumentos();
                 <div class="card-body" style="text-align: center;">
                     <i class="fa-solid fa-wallet" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3 style="margin: 8px 0 4px; color: var(--primary-dark);">Presupuesto 2026</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Ejecucion activa por rubros</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Ejecución activa por rubros</p>
                 </div>
             </div>
             <div class="card" style="margin-bottom: 0;">
@@ -59,7 +59,7 @@ $documentos = $directivaModel->obtenerDocumentos();
         <!-- Ejecucion Presupuestaria -->
         <section class="card">
             <div class="card-header">
-                <h2><i class="fa-solid fa-chart-line"></i> Seguimiento de Ejecucion Presupuestaria (2026)</h2>
+                <h2><i class="fa-solid fa-chart-line"></i> Seguimiento de Ejecución Presupuestaria (2026)</h2>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -122,7 +122,7 @@ $documentos = $directivaModel->obtenerDocumentos();
                                     <td>$<?= number_format($prov['monto_contrato'], 2) ?></td>
                                     <td>
                                         <?php if ($prov['estado_pago'] === 'AL_DIA'): ?>
-                                            <span class="badge badge-success">AL DIA</span>
+                                            <span class="badge badge-success">AL DÍA</span>
                                         <?php elseif ($prov['estado_pago'] === 'PENDIENTE'): ?>
                                             <span class="badge badge-danger">PENDIENTE</span>
                                         <?php else: ?>
@@ -149,7 +149,7 @@ $documentos = $directivaModel->obtenerDocumentos();
                             <thead>
                                 <tr>
                                     <th>Categoria</th>
-                                    <th>Titulo</th>
+                                    <th>Título</th>
                                     <th>Fecha</th>
                                 </tr>
                             </thead>
@@ -168,7 +168,7 @@ $documentos = $directivaModel->obtenerDocumentos();
                     <ul style="list-style: none; padding: 0; margin: 0; line-height: 2.4;">
                         <li><i class="fa-solid fa-scroll text-primary"></i> <strong>Leyes & Reglamento General:</strong> Ley de Propiedad Horizontal Vigente.</li>
                         <li><i class="fa-solid fa-file-signature text-primary"></i> <strong>Actas de Asamblea:</strong> Acta No. 04 - Asamblea General Ordinaria 2026.</li>
-                        <li><i class="fa-solid fa-building-user text-primary"></i> <strong>Actas de Directiva:</strong> Sesion Extraordinaria de Directiva - Julio 2026.</li>
+                        <li><i class="fa-solid fa-building-user text-primary"></i> <strong>Actas de Directiva:</strong> Sesión Extraordinaria de Directiva - Julio 2026.</li>
                         <li><i class="fa-solid fa-file-contract text-primary"></i> <strong>Declaratoria:</strong> Escritura matriz y alicuotas del conjunto.</li>
                     </ul>
                 <?php endif; ?>

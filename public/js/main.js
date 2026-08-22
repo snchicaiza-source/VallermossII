@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteForms = document.querySelectorAll('form[onsubmit]');
     deleteForms.forEach(function(form) {
         if (!form.getAttribute('onsubmit')) {
-            form.setAttribute('onsubmit', 'return confirm("Esta seguro de realizar esta accion?");');
+            form.setAttribute('onsubmit', 'return confirm("¿Está seguro de realizar esta acción?");');
         }
     });
 });

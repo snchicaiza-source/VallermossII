@@ -2,10 +2,12 @@
 session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../models/Incidencia.php';
 
 verificarRol(['ADMINISTRADOR', 'DIRECTIVA']);
 
 $db = Database::obtenerConexion();
+Incidencia::asegurarTabla();
 $stmt = $db->query("SELECT i.*, u.nombres, u.numero_vivienda FROM incidencias i LEFT JOIN usuarios u ON i.id_usuario = u.id_usuario ORDER BY i.fecha DESC");
 $incidencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -16,8 +18,9 @@ $msg = $_GET['msg'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion de Incidencias - Vallermosso II</title>
+    <title>Gestión de Incidencias - Vallermosso II</title>
     <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/tablas.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -27,8 +30,8 @@ $msg = $_GET['msg'] ?? '';
 
     <main class="main-content">
         <header class="content-header">
-            <h1><i class="fa-solid fa-triangle-exclamation"></i> Gestion de Incidencias y Reportes</h1>
-            <p class="subtitle">Seguimiento de danos, quejas y solicitudes reportadas por los residentes.</p>
+            <h1><i class="fa-solid fa-triangle-exclamation"></i> Gestión de Incidencias y Reportes</h1>
+            <p class="subtitle">Seguimiento de daños, quejas y solicitudes reportadas por los residentes.</p>
         </header>
 
 
@@ -49,17 +52,35 @@ $msg = $_GET['msg'] ?? '';
                 <h2><i class="fa-solid fa-list-check"></i> Reportes Recibidos</h2>
             </div>
             <div class="card-body">
+                <div class="tabla-toolbar">
+                    <div class="filtro-grupo">
+                        <span class="filtro-etiqueta">Buscar</span>
+                        <div class="buscador-tabla">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" data-buscar="tablaIncidencias" placeholder="Buscar por residente, vivienda o descripción...">
+                        </div>
+                    </div>
+                    <div class="filtro-grupo">
+                        <span class="filtro-etiqueta">Estado</span>
+                        <select class="filtro-tabla" data-filtro-tabla="tablaIncidencias" data-filtro-col="5">
+                            <option value="">Todos los estados</option>
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="EN REVISION">En revisión</option>
+                            <option value="RESUELTO">Resuelto</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="tablaIncidencias" data-por-pagina="10">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Residente</th>
                                 <th>Vivienda</th>
                                 <th>Tipo</th>
-                                <th>Descripcion</th>
+                                <th>Descripción</th>
                                 <th>Estado</th>
-                                <th>Accion</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,24 +101,28 @@ $msg = $_GET['msg'] ?? '';
                                             <?php if ($estado === 'RESUELTO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> RESUELTO</span>
                                             <?php elseif ($estado === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISIÓN</span>
                                             <?php else: ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-hourglass"></i> PENDIENTE</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline-block;">
-                                                <input type="hidden" name="action" value="cambiar_estado_incidencia">
-                                                <input type="hidden" name="id" value="<?= $inc['id'] ?>">
+                                            <?php if (strtoupper($_SESSION['rol'] ?? $_SESSION['usuario_rol'] ?? '') === 'ADMINISTRADOR'): ?>
+                                                <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline-block;">
+                                                    <input type="hidden" name="action" value="cambiar_estado_incidencia">
+                                                    <input type="hidden" name="id" value="<?= $inc['id'] ?>">
 
-                                                <?php if ($inc['estado'] === 'PENDIENTE'): ?>
-                                                    <button type="submit" name="nuevo_estado" value="EN_REVISION" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-spinner"></i></button>
-                                                <?php elseif ($inc['estado'] === 'EN_REVISION'): ?>
-                                                    <button type="submit" name="nuevo_estado" value="RESUELTO" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-check"></i></button>
-                                                <?php else: ?>
-                                                    <span class="text-muted"><i class="fa-solid fa-circle-check text-success"></i></span>
-                                                <?php endif; ?>
-                                            </form>
+                                                    <?php if ($inc['estado'] === 'PENDIENTE'): ?>
+                                                        <button type="submit" name="nuevo_estado" value="EN_REVISION" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-spinner"></i></button>
+                                                    <?php elseif ($inc['estado'] === 'EN_REVISION'): ?>
+                                                        <button type="submit" name="nuevo_estado" value="RESUELTO" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-check"></i></button>
+                                                    <?php else: ?>
+                                                        <span class="text-muted"><i class="fa-solid fa-circle-check text-success"></i></span>
+                                                    <?php endif; ?>
+                                                </form>
+                                            <?php else: ?>
+                                                <span class="text-muted">Solo administración</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -111,5 +136,6 @@ $msg = $_GET['msg'] ?? '';
 </div>
 
 <script src="../../public/js/sidebar.js"></script>
+<script src="../../public/js/tablas.js?v=3"></script>
 </body>
 </html>

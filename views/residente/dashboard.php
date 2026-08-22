@@ -66,7 +66,7 @@ $vivienda = $_SESSION['numero_vivienda'] ?? $_SESSION['usuario_vivienda'] ?? '';
         <!-- Seccion Subir Comprobante -->
         <section class="card">
             <div class="card-header">
-                <h2><i class="fa-solid fa-upload"></i> Reportar Pago de Alicuota</h2>
+                <h2><i class="fa-solid fa-upload"></i> Reportar Pago de Alícuota</h2>
             </div>
             <div class="card-body">
                 <form action="../../controllers/ResidenteController.php" method="POST" enctype="multipart/form-data" class="grid-form">
@@ -79,7 +79,7 @@ $vivienda = $_SESSION['numero_vivienda'] ?? $_SESSION['usuario_vivienda'] ?? '';
 
                     <div class="form-group">
                         <label for="concepto">Concepto / Mes</label>
-                        <input type="text" id="concepto" name="concepto" class="form-control" placeholder="Ej. Alicuota Agosto 2026" required>
+                        <input type="text" id="concepto" name="concepto" class="form-control" placeholder="Ej. Alícuota Agosto 2026" required>
                     </div>
 
                     <div class="form-group span-full">
@@ -153,7 +153,7 @@ $vivienda = $_SESSION['numero_vivienda'] ?? $_SESSION['usuario_vivienda'] ?? '';
                                             <?php if ($estado === 'PAGADO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> PAGADO</span>
                                             <?php elseif ($estado === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISIÓN</span>
                                             <?php else: ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-hourglass"></i> PENDIENTE</span>
                                             <?php endif; ?>

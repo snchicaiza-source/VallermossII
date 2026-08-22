@@ -57,11 +57,6 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <label for="comprobante">Comprobante de pago (jpg, png, pdf)</label>
                         <input type="file" id="comprobante" name="comprobante" accept=".jpg,.jpeg,.png,.pdf" style="width:100%; padding:0.5rem;">
                     </div>
-                    <div style="display:flex; align-items:flex-end;">
-                        <div style="padding:0.5rem; background:#fff8e1; border:1px solid #ffe082; border-radius:4px; font-size:0.9rem;">
-                            <i class="fa-solid fa-clock"></i> Estado: <strong>EN REVISION</strong>
-                        </div>
-                    </div>
                     <div style="grid-column: 1 / -1;">
                         <button type="submit" class="btn btn-primary" style="padding:0.6rem 1.5rem; cursor:pointer;">
                             <i class="fa-solid fa-paper-plane"></i> Enviar Pago
@@ -103,7 +98,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?php if ($est === 'PAGADO'): ?>
                                                 <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> PAGADO</span>
                                             <?php elseif ($est === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISION</span>
+                                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> EN REVISIÓN</span>
                                             <?php elseif ($est === 'RECHAZADO'): ?>
                                                 <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> RECHAZADO</span>
                                             <?php else: ?>

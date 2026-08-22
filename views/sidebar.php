@@ -25,7 +25,7 @@ if (strtoupper($rol) === 'ADMINISTRADOR') {
         ['icon' => 'fa-solid fa-truck-field', 'label' => 'Proveedores', 'file' => 'proveedores.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-chart-pie', 'label' => 'Ejec. Presupuestaria', 'file' => 'ejecucion_presupuestaria.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-scale-balanced', 'label' => 'Doc. Legal', 'file' => 'documentacion_legal.php', 'section' => 'administrador'],
-        ['icon' => 'fa-solid fa-folder-open', 'label' => 'Tramites', 'file' => 'tramites.php', 'section' => 'administrador'],
+        ['icon' => 'fa-solid fa-folder-open', 'label' => 'Trámites', 'file' => 'tramites.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-boxes-stacked', 'label' => 'Activos', 'file' => 'activos.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-building', 'label' => 'Espacios', 'file' => 'espacios.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-triangle-exclamation', 'label' => 'Incidencias', 'file' => 'incidencias.php', 'section' => 'administrador'],
@@ -36,9 +36,9 @@ if (strtoupper($rol) === 'ADMINISTRADOR') {
         ['icon' => 'fa-solid fa-landmark', 'label' => 'Dashboard', 'file' => 'dashboard.php', 'section' => 'directiva'],
         ['icon' => 'fa-solid fa-chart-line', 'label' => 'Ejec. Presupuestaria', 'file' => 'ejecucion_presupuestaria.php', 'section' => 'directiva'],
         ['icon' => 'fa-solid fa-scale-balanced', 'label' => 'Doc. Legal', 'file' => 'documentacion_legal.php', 'section' => 'directiva'],
-        ['icon' => 'fa-solid fa-file-invoice-dollar', 'label' => 'Verificar Pagos', 'file' => 'verificar_pagos.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-bullhorn', 'label' => 'Comunicados', 'file' => 'comunicados.php', 'section' => 'administrador'],
         ['icon' => 'fa-solid fa-triangle-exclamation', 'label' => 'Incidencias', 'file' => 'incidencias.php', 'section' => 'administrador'],
+        ['icon' => 'fa-solid fa-truck-field', 'label' => 'Estado Proveedores', 'file' => 'proveedores.php', 'section' => 'directiva'],
         ['icon' => 'fa-solid fa-square-poll-vertical', 'label' => 'Encuestas', 'file' => 'encuestas.php', 'section' => 'directiva'],
     ];
 } elseif (strtoupper($rol) === 'RESIDENTE') {
@@ -47,9 +47,10 @@ if (strtoupper($rol) === 'ADMINISTRADOR') {
         ['icon' => 'fa-solid fa-user-gear', 'label' => 'Mi Perfil', 'file' => 'perfil.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-file-invoice-dollar', 'label' => 'Estado de Cuenta', 'file' => 'estado_cuenta.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-receipt', 'label' => 'Reporte Pagos', 'file' => 'reporte_pagos.php', 'section' => 'residente'],
+        ['icon' => 'fa-solid fa-money-check-dollar', 'label' => 'Recibos de Pago', 'file' => 'recibos_pago.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-calendar-check', 'label' => 'Reservas', 'file' => 'reservas.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-chart-bar', 'label' => 'Encuestas', 'file' => 'encuestas.php', 'section' => 'residente'],
-        ['icon' => 'fa-solid fa-screwdriver-wrench', 'label' => 'Reportar Danos', 'file' => 'reportar_danos.php', 'section' => 'residente'],
+        ['icon' => 'fa-solid fa-screwdriver-wrench', 'label' => 'Reportar Daños', 'file' => 'reportar_danos.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-flag', 'label' => 'Denuncias', 'file' => 'denuncias.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-certificate', 'label' => 'Cert. Deuda', 'file' => 'certificado_deuda.php', 'section' => 'residente'],
         ['icon' => 'fa-solid fa-book', 'label' => 'Normativa', 'file' => 'normativa.php', 'section' => 'residente'],
@@ -455,7 +456,7 @@ table tr:hover td { background: #FDFCFA; }
     .main-content { margin-left: 0; padding: 16px; }
 }
 
-/* Notification Bell */
+/* ============ CAMPANA DE NOTIFICACIONES ESTILO FACEBOOK ============ */
 .notif-bell-wrapper {
     position: relative;
 }
@@ -465,8 +466,8 @@ table tr:hover td { background: #FDFCFA; }
     color: #C8BFB4;
     cursor: pointer;
     padding: 6px 8px;
-    border-radius: 6px;
-    transition: all 0.3s;
+    border-radius: 50%;
+    transition: all 0.25s;
     font-size: 1rem;
     position: relative;
 }
@@ -474,138 +475,219 @@ table tr:hover td { background: #FDFCFA; }
     background: #3E3732;
     color: #FFFFFF;
 }
+.notif-bell-btn.ringing i {
+    animation: notifRing 0.6s ease-in-out;
+}
+@keyframes notifRing {
+    0% { transform: rotate(0); }
+    20% { transform: rotate(18deg); }
+    40% { transform: rotate(-14deg); }
+    60% { transform: rotate(10deg); }
+    80% { transform: rotate(-6deg); }
+    100% { transform: rotate(0); }
+}
 .notif-badge {
     position: absolute;
-    top: 0;
-    right: 0;
-    background: #B86B61;
+    top: -2px;
+    right: -4px;
+    background: #E0331B;
     color: #fff;
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    min-width: 16px;
-    height: 16px;
-    line-height: 16px;
+    min-width: 17px;
+    height: 17px;
+    line-height: 17px;
     text-align: center;
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 0 4px;
     display: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
 }
 .notif-badge.visible { display: block; }
-.notif-dropdown {
+.notif-badge.pulse { animation: notifPulse 1.2s ease-out 2; }
+@keyframes notifPulse {
+    0% { box-shadow: 0 0 0 0 rgba(224, 51, 27, 0.55); }
+    70% { box-shadow: 0 0 0 10px rgba(224, 51, 27, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(224, 51, 27, 0); }
+}
+
+/* Panel flotante anclado bajo la campana */
+.notif-backdrop {
     display: none;
     position: fixed;
-    top: 0;
-    left: 260px;
-    width: 380px;
-    height: 100vh;
+    inset: 0;
+    z-index: 1998;
+    background: transparent;
+}
+.notif-backdrop.open { display: block; }
+
+.notif-dropdown {
+    position: fixed;
+    top: 64px;
+    left: 272px;
+    width: 400px;
+    max-height: min(560px, calc(100vh - 84px));
     background: #FFFFFF;
-    border-left: 1px solid #D8CFC4;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    border: 1px solid #E3DCD3;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(30, 27, 25, 0.22), 0 2px 8px rgba(30, 27, 25, 0.10);
     z-index: 2000;
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    transform: translateX(-100%);
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transition: opacity 0.18s ease, transform 0.18s ease;
 }
 .notif-dropdown.open {
     display: flex;
-    flex-direction: column;
-    transform: translateX(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+@media (max-width: 768px) {
+    .notif-dropdown {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        top: 60px;
+        max-height: 70vh;
+    }
 }
 
 .notif-dropdown-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    gap: 8px;
+    padding: 14px 18px;
     border-bottom: 1px solid #EDE9E3;
-    background: #FDFCFA;
     flex-shrink: 0;
 }
 .notif-dropdown-header h3 {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: #36322E;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+.notif-count-pill {
+    background: #E0331B;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 10px;
+    padding: 0 6px;
+    display: none;
+}
+.notif-count-pill.visible { display: inline-block; }
 .notif-mark-all {
     background: none;
     border: none;
     color: #A38F78;
     cursor: pointer;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
 }
-.notif-mark-all:hover { color: #7D6B56; text-decoration: underline; }
+.notif-mark-all:hover { background: #F7F5F0; color: #7D6B56; }
+
 .notif-dropdown-body {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
+.notif-dropdown-body::-webkit-scrollbar { width: 5px; }
+.notif-dropdown-body::-webkit-scrollbar-thumb { background: #D8CFC4; border-radius: 4px; }
+
 .notif-item {
     display: flex;
+    align-items: flex-start;
     gap: 12px;
-    padding: 14px 20px;
-    border-bottom: 1px solid #F0ECE7;
+    padding: 13px 18px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.15s;
     position: relative;
+    border-bottom: 1px solid #F3F0EB;
 }
-.notif-item:hover { background: #FDFCFA; }
-.notif-item.no-leida { background: #FDF8F0; }
-.notif-item.no-leida:hover { background: #FAF3E6; }
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: #F7F5F0; }
+.notif-item.no-leida { background: #FDF6EC; }
+.notif-item.no-leida:hover { background: #FAF0DE; }
+
 .notif-item-icon {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 1rem;
+    font-size: 1.05rem;
+    position: relative;
 }
-.notif-item-icon.comunicado { background: #E8F0E5; color: #6E7E65; }
-.notif-item-icon.pago { background: #E5EDF5; color: #6B8FAD; }
-.notif-item-icon.reserva { background: #F5E5F0; color: #AD6B8F; }
-.notif-item-icon.incidencia { background: #F5E5E3; color: #B86B61; }
-.notif-item-icon.general { background: #F7F5F0; color: #A38F78; }
+.notif-item-icon.comunicado { background: linear-gradient(135deg, #E8F0E5, #D5E3CF); color: #56704C; }
+.notif-item-icon.pago       { background: linear-gradient(135deg, #E5EDF5, #CFDEED); color: #4F7796; }
+.notif-item-icon.reserva    { background: linear-gradient(135deg, #F5E5F0, #EACFDF); color: #96567C; }
+.notif-item-icon.incidencia { background: linear-gradient(135deg, #F5E5E3, #EDCFCB); color: #A34F45; }
+.notif-item-icon.proveedor  { background: linear-gradient(135deg, #F0EAE0, #E0D3BE); color: #7D6B56; }
+.notif-item-icon.encuesta   { background: linear-gradient(135deg, #E5F0EF, #CFE3E1); color: #4F807B; }
+.notif-item-icon.sistema    { background: linear-gradient(135deg, #F7F5F0, #E8E3DA); color: #A38F78; }
+
 .notif-item-content {
     flex: 1;
     min-width: 0;
 }
 .notif-item-title {
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     font-weight: 600;
     color: #36322E;
     margin-bottom: 2px;
+    line-height: 1.3;
 }
+.no-leida .notif-item-title { font-weight: 700; }
 .notif-item-text {
-    font-size: 0.8rem;
+    font-size: 0.79rem;
     color: #7A7268;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.35;
 }
 .notif-item-time {
-    font-size: 0.72rem;
+    font-size: 0.71rem;
     color: #A38F78;
     margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 .notif-item-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #A38F78;
     position: absolute;
-    top: 20px;
+    top: 16px;
     right: 16px;
+    box-shadow: 0 0 0 3px rgba(163, 143, 120, 0.18);
 }
 .notif-item-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.15s;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 .notif-item:hover .notif-item-actions { opacity: 1; }
 .notif-item-actions button {
@@ -613,24 +695,26 @@ table tr:hover td { background: #FDFCFA; }
     border: none;
     cursor: pointer;
     color: #A38F78;
-    font-size: 0.75rem;
-    padding: 2px 4px;
-    border-radius: 3px;
+    font-size: 0.78rem;
+    padding: 4px 6px;
+    border-radius: 5px;
 }
 .notif-item-actions button:hover {
-    background: #F7F5F0;
-    color: #36322E;
+    background: #EDE9E3;
+    color: #8B3A31;
 }
 .notif-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 48px 20px;
     color: #A38F78;
+    text-align: center;
 }
-.notif-empty i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
-.notif-empty p { font-size: 0.9rem; }
+.notif-empty i { font-size: 2.4rem; margin-bottom: 12px; opacity: 0.45; }
+.notif-empty p { font-size: 0.88rem; margin: 0; }
+.notif-empty small { font-size: 0.76rem; color: #B5AC9F; margin-top: 4px; }
 
 </style>
 
@@ -688,17 +772,22 @@ table tr:hover td { background: #FDFCFA; }
             <input type="hidden" name="action" value="logout">
             <button type="submit" class="btn-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
-                <span class="nav-text">Cerrar Sesion</span>
+                <span class="nav-text">Cerrar Sesión</span>
             </button>
         </form>
     </div>
 </aside>
 
-<!-- Notificaciones Dropdown -->
-<div id="notifDropdown" class="notif-dropdown">
+<!-- Campana: panel flotante estilo Facebook -->
+<div id="notifBackdrop" class="notif-backdrop"></div>
+<div id="notifDropdown" class="notif-dropdown" role="dialog" aria-label="Notificaciones">
     <div class="notif-dropdown-header">
-        <h3><i class="fa-solid fa-bell" style="color: #A38F78;"></i> Notificaciones</h3>
-        <button class="notif-mark-all" onclick="notifMarcarTodas()">Marcar todo como leido</button>
+        <h3><i class="fa-solid fa-bell" style="color: #A38F78;"></i> Notificaciones
+            <span id="notifCountPill" class="notif-count-pill">0</span>
+        </h3>
+        <button class="notif-mark-all" onclick="notifMarcarTodas()" title="Marcar todas como leidas">
+            <i class="fa-solid fa-check-double"></i> Marcar todo como leído
+        </button>
     </div>
     <div id="notifDropdownBody" class="notif-dropdown-body">
         <div class="notif-empty">
@@ -712,9 +801,24 @@ table tr:hover td { background: #FDFCFA; }
 (function() {
     var bell = document.getElementById('notifBellBtn');
     var dropdown = document.getElementById('notifDropdown');
+    var backdrop = document.getElementById('notifBackdrop');
     var badge = document.getElementById('notifBadge');
+    var pill = document.getElementById('notifCountPill');
     var body = document.getElementById('notifDropdownBody');
     var open = false;
+    var ultimoTotal = null;
+
+    function setContador(total) {
+        if (total > 0) {
+            badge.textContent = total > 99 ? '99+' : total;
+            badge.classList.add('visible');
+            pill.textContent = total > 99 ? '99+' : total;
+            pill.classList.add('visible');
+        } else {
+            badge.classList.remove('visible');
+            pill.classList.remove('visible');
+        }
+    }
 
     function notifTimeAgo(dateStr) {
         var d = new Date(dateStr.replace(' ', 'T') + (dateStr.indexOf('+') === -1 && dateStr.indexOf('Z') === -1 ? '+00:00' : ''));
@@ -723,7 +827,7 @@ table tr:hover td { background: #FDFCFA; }
         if (diff < 60) return 'Hace un momento';
         if (diff < 3600) return 'Hace ' + Math.floor(diff / 60) + ' min';
         if (diff < 86400) return 'Hace ' + Math.floor(diff / 3600) + ' h';
-        if (diff < 604800) return 'Hace ' + Math.floor(diff / 86400) + ' dia(s)';
+        if (diff < 604800) return 'Hace ' + Math.floor(diff / 86400) + ' dia' + (Math.floor(diff / 86400) > 1 ? 's' : '');
         return d.toLocaleDateString('es-EC', {day: 'numeric', month: 'short'});
     }
 
@@ -732,39 +836,51 @@ table tr:hover td { background: #FDFCFA; }
             'COMUNICADO': '<i class="fa-solid fa-bullhorn"></i>',
             'PAGO': '<i class="fa-solid fa-file-invoice-dollar"></i>',
             'RESERVA': '<i class="fa-solid fa-calendar-check"></i>',
-            'INCIDENCIA': '<i class="fa-solid fa-triangle-exclamation"></i>'
+            'INCIDENCIA': '<i class="fa-solid fa-triangle-exclamation"></i>',
+            'PROVEEDOR': '<i class="fa-solid fa-truck-field"></i>',
+            'ENCUESTA': '<i class="fa-solid fa-square-poll-vertical"></i>',
+            'SISTEMA': '<i class="fa-solid fa-gear"></i>'
         };
         return icons[tipo] || '<i class="fa-solid fa-bell"></i>';
     }
 
     function notifClass(tipo) {
-        var cls = {'COMUNICADO':'comunicado','PAGO':'pago','RESERVA':'reserva','INCIDENCIA':'incidencia'};
-        return cls[tipo] || 'general';
+        var cls = {'COMUNICADO':'comunicado','PAGO':'pago','RESERVA':'reserva','INCIDENCIA':'incidencia','PROVEEDOR':'proveedor','ENCUESTA':'encuesta','SISTEMA':'sistema'};
+        return cls[tipo] || 'sistema';
     }
 
     function notifUrl(refTipo, refId) {
-        var map = {
-            'comunicado': 'administrador/comunicados',
-            'pago': 'residente/reporte_pagos',
-            'reserva': 'residente/reservas',
-            'incidencia': 'administrador/incidencias'
-        };
+        // Mapa segun el rol de quien ve la notificacion
+        var esGestion = <?= in_array(strtoupper($rol), ['ADMINISTRADOR', 'DIRECTIVA']) ? 'true' : 'false' ?>;
+        var map;
+        if (esGestion) {
+            map = {
+                'comunicado': '<?= strtoupper($rol) === 'ADMINISTRADOR' ? 'administrador/comunicados' : 'directiva/dashboard' ?>',
+                'pago': 'administrador/verificar_pagos',
+                'reserva': 'directiva/dashboard',
+                'incidencia': 'administrador/incidencias',
+                'proveedor': '<?= strtoupper($rol) === 'ADMINISTRADOR' ? 'administrador/proveedores' : 'directiva/proveedores' ?>',
+                'encuesta': '<?= strtoupper($rol) === 'ADMINISTRADOR' ? 'administrador/encuestas' : 'directiva/encuestas' ?>'
+            };
+        } else {
+            map = {
+                'comunicado': 'residente/dashboard',
+                'pago': 'residente/reporte_pagos',
+                'reserva': 'residente/reservas',
+                'incidencia': 'residente/reportar_danos',
+                'encuesta': 'residente/encuestas'
+            };
+        }
         var path = map[refTipo] || '';
         if (path) return '../' + path + '.php';
         return null;
     }
 
     function renderNotifs(data) {
-        var total = data.total_no_leidas;
-        if (total > 0) {
-            badge.textContent = total > 99 ? '99+' : total;
-            badge.classList.add('visible');
-        } else {
-            badge.classList.remove('visible');
-        }
+        setContador(data.total_no_leidas);
 
         if (!data.notificaciones || data.notificaciones.length === 0) {
-            body.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-bell-slash"></i><p>No tienes notificaciones nuevas</p></div>';
+            body.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-bell-slash"></i><p>No tienes notificaciones</p><small>Aquí verás los avisos del conjunto</small></div>';
             return;
         }
 
@@ -780,7 +896,7 @@ table tr:hover td { background: #FDFCFA; }
             html += '  <div class="notif-item-content">';
             html += '    <div class="notif-item-title">' + escHtml(n.titulo) + '</div>';
             html += '    <div class="notif-item-text">' + escHtml(n.mensaje || '') + '</div>';
-            html += '    <div class="notif-item-time">' + notifTimeAgo(n.fecha_creacion) + '</div>';
+            html += '    <div class="notif-item-time"><i class="fa-regular fa-clock"></i> ' + notifTimeAgo(n.fecha_creacion) + '</div>';
             html += '  </div>';
             html += '  <div class="notif-item-actions">';
             html += '    <button onclick="event.stopPropagation();notifEliminar(' + n.id + ')" title="Eliminar"><i class="fa-solid fa-times"></i></button>';
@@ -798,42 +914,57 @@ table tr:hover td { background: #FDFCFA; }
     }
 
     function fetchNotifs() {
-        fetch('../api/notificaciones.php?action=list')
+        fetch('../../api/notificaciones.php?action=list')
             .then(function(r) { return r.json(); })
             .then(function(data) { renderNotifs(data); })
             .catch(function() { body.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-exclamation-triangle"></i><p>Error al cargar notificaciones</p></div>'; });
     }
 
+    // Polling ligero: solo cuenta no leidas. Si aumentan, avisa con animacion.
     function fetchCount() {
-        fetch('../api/notificaciones.php?action=count')
+        fetch('../../api/notificaciones.php?action=count')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 var t = data.total_no_leidas;
-                if (t > 0) { badge.textContent = t > 99 ? '99+' : t; badge.classList.add('visible'); }
-                else { badge.classList.remove('visible'); }
+                if (ultimoTotal !== null && t > ultimoTotal) {
+                    bell.classList.remove('ringing');
+                    void bell.offsetWidth; /* reinicia animacion */
+                    bell.classList.add('ringing');
+                    badge.classList.remove('pulse');
+                    void badge.offsetWidth;
+                    badge.classList.add('pulse');
+                    if (open) fetchNotifs();
+                }
+                ultimoTotal = t;
+                setContador(t);
             })
             .catch(function(){});
     }
 
+    function abrirPanel() {
+        open = true;
+        dropdown.classList.add('open');
+        backdrop.classList.add('open');
+        fetchNotifs();
+    }
+
+    function cerrarPanel() {
+        open = false;
+        dropdown.classList.remove('open');
+        backdrop.classList.remove('open');
+    }
+
     bell.addEventListener('click', function(e) {
         e.stopPropagation();
-        open = !open;
-        if (open) {
-            dropdown.classList.add('open');
-            fetchNotifs();
-        } else {
-            dropdown.classList.remove('open');
-        }
+        if (open) cerrarPanel(); else abrirPanel();
     });
 
+    backdrop.addEventListener('click', cerrarPanel);
     dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarPanel(); });
 
-    document.addEventListener('click', function() {
-        if (open) { dropdown.classList.remove('open'); open = false; }
-    });
-
-    // Poll cada 30 segundos
-    setInterval(fetchCount, 30000);
+    // Tiempo real por polling corto (15s): compatible con hosting compartido.
+    setInterval(fetchCount, 15000);
     fetchCount();
 
     // Expose globals
@@ -843,34 +974,29 @@ table tr:hover td { background: #FDFCFA; }
     };
 
     window.notifMarcarUna = function(id) {
-        fetch('../api/notificaciones.php?action=marcar_leida&id_notificacion=' + id, {method:'POST'})
+        fetch('../../api/notificaciones.php?action=marcar_leida&id_notificacion=' + id, {method:'POST'})
             .then(function(r){return r.json();})
             .then(function(d){
-                if(d.total_no_leidas !== undefined){
-                    if(d.total_no_leidas>0){badge.textContent=d.total_no_leidas>99?'99+':d.total_no_leidas;badge.classList.add('visible');}
-                    else{badge.classList.remove('visible');}
-                }
+                ultimoTotal = d.total_no_leidas !== undefined ? d.total_no_leidas : ultimoTotal;
                 fetchNotifs();
             });
     };
 
     window.notifEliminar = function(id) {
-        fetch('../api/notificaciones.php?action=eliminar&id_notificacion=' + id, {method:'POST'})
+        fetch('../../api/notificaciones.php?action=eliminar&id_notificacion=' + id, {method:'POST'})
             .then(function(r){return r.json();})
             .then(function(d){
-                if(d.total_no_leidas !== undefined){
-                    if(d.total_no_leidas>0){badge.textContent=d.total_no_leidas>99?'99+':d.total_no_leidas;badge.classList.add('visible');}
-                    else{badge.classList.remove('visible');}
-                }
+                ultimoTotal = d.total_no_leidas !== undefined ? d.total_no_leidas : ultimoTotal;
                 fetchNotifs();
             });
     };
 
     window.notifMarcarTodas = function() {
-        fetch('../api/notificaciones.php?action=marcar_todas', {method:'POST'})
+        fetch('../../api/notificaciones.php?action=marcar_todas', {method:'POST'})
             .then(function(r){return r.json();})
-            .then(function(d){
-                badge.classList.remove('visible');
+            .then(function(){
+                ultimoTotal = 0;
+                setContador(0);
                 fetchNotifs();
             });
     };

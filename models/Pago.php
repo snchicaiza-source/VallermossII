@@ -16,12 +16,13 @@ class Pago {
                     VALUES (:id_usuario, :monto, :concepto, :comprobante_url, 'PENDIENTE', CURDATE())";
             
             $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute([
+            $ok = $stmt->execute([
                 ':id_usuario'      => $id_usuario,
                 ':monto'           => $monto,
                 ':concepto'        => $concepto,
                 ':comprobante_url' => $comprobante_url
             ]);
+            return $ok ? (int)$this->pdo->lastInsertId() : false;
         } catch (PDOException $e) {
             return false;
         }

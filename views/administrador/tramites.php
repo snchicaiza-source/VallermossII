@@ -123,7 +123,7 @@ $error = $_GET['error'] ?? '';
                                                     <span class="text-muted"><i class="fa-solid fa-circle-check text-success"></i> Cerrado</span>
                                                 <?php endif; ?>
                                             </form>
-                                            <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline;" onsubmit="return confirm('Eliminar este tramite?');">
+                                            <form action="../../controllers/AdministradorController.php" method="POST" style="display:inline;" onsubmit="return confirm('Eliminar este trámite?');">
                                                 <input type="hidden" name="action" value="eliminar_tramite">
                                                 <input type="hidden" name="id" value="<?= $t['id'] ?>">
                                                 <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i class="fa-solid fa-trash"></i></button>

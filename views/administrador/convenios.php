@@ -41,12 +41,12 @@ $error = $_GET['error'] ?? '';
         </header>
 
 
-        <?php if ($msg === 'creado'): ?>
-            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Convenio de pago registrado correctamente.</div>
-        <?php elseif ($msg === 'actualizado'): ?>
-            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Estado del convenio actualizado.</div>
-        <?php elseif ($error === 'campos_vacios'): ?>
-            <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> Por favor llene todos los datos obligatorios.</div>
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> <?= $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?></div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?></div>
         <?php endif; ?>
 
         <section class="card">
@@ -76,7 +76,7 @@ $error = $_GET['error'] ?? '';
                     </div>
 
                     <div class="form-group">
-                        <label for="num_cuotas">Numero de Cuotas / Meses</label>
+                        <label for="num_cuotas">Número de Cuotas / Meses</label>
                         <input type="number" min="1" max="24" id="num_cuotas" name="num_cuotas" class="form-control" placeholder="Ej. 6" required>
                     </div>
 
@@ -97,12 +97,12 @@ $error = $_GET['error'] ?? '';
                         <thead>
                             <tr>
                                 <th>Residente</th>
-                                <th>Ubicacion</th>
+                                <th>Ubicación</th>
                                 <th>Monto Total</th>
                                 <th>N Cuotas</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
-                                <th>Accion</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody>

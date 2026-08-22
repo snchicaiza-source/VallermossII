@@ -64,7 +64,7 @@ $fechaCertificado = date('d \d\e F \d\e Y');
                 <div style="margin-bottom: 30px;">
                     <p><strong>Fecha de emision:</strong> <?= $fechaCertificado ?></p>
                     <p><strong>Residente:</strong> <?= htmlspecialchars($nombre) ?></p>
-                    <p><strong>Cedula:</strong> <?= htmlspecialchars($cedula) ?></p>
+                    <p><strong>Cédula:</strong> <?= htmlspecialchars($cedula) ?></p>
                     <p><strong>Vivienda:</strong> <?= htmlspecialchars($vivienda) ?></p>
                 </div>
 
@@ -93,7 +93,7 @@ $fechaCertificado = date('d \d\e F \d\e Y');
                                         <td><?= $d['fecha_vencimiento'] ? date('d/m/Y', strtotime($d['fecha_vencimiento'])) : 'N/A' ?></td>
                                         <td>
                                             <?php if ($d['estado'] === 'EN_REVISION'): ?>
-                                                <span class="badge badge-warning">EN REVISION</span>
+                                                <span class="badge badge-warning">EN REVISIÓN</span>
                                             <?php elseif ($d['estado'] === 'RECHAZADO'): ?>
                                                 <span class="badge badge-danger">RECHAZADO</span>
                                             <?php else: ?>

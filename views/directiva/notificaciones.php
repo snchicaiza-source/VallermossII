@@ -50,7 +50,7 @@ $notificacionesLog = $stmtLog->fetchAll(PDO::FETCH_ASSOC);
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
-                            <tr><th>Residente</th><th>Telefono</th><th>Accion</th></tr>
+                            <tr><th>Residente</th><th>Teléfono</th><th>Acción</th></tr>
                         </thead>
                         <tbody>
                             <?php foreach ($_SESSION['whatsapp_links'] as $link): ?>
@@ -77,22 +77,22 @@ $notificacionesLog = $stmtLog->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" name="action" value="crear_comunicado">
 
                     <div class="form-group span-full">
-                        <label for="titulo"><strong>Titulo del Comunicado</strong></label>
+                        <label for="titulo"><strong>Título del Comunicado</strong></label>
                         <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Convocatoria a Asamblea General Extraordinaria" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="canal"><strong>Canal de Notificacion</strong></label>
+                        <label for="canal"><strong>Canal de Notificación</strong></label>
                         <select id="canal" name="canal" class="form-control" required>
                             <option value="AMBOS">Correo + WhatsApp</option>
-                            <option value="EMAIL">Solo Correo Electronico</option>
+                            <option value="EMAIL">Solo Correo Electrónico</option>
                             <option value="WHATSAPP">Solo WhatsApp</option>
                         </select>
                     </div>
 
                     <div class="form-group span-full">
                         <label for="contenido"><strong>Detalle / Mensaje</strong></label>
-                        <textarea id="contenido" name="contenido" class="form-control" rows="5" placeholder="Escriba aqui los detalles del aviso..." required></textarea>
+                        <textarea id="contenido" name="contenido" class="form-control" rows="5" placeholder="Escriba aquí los detalles del aviso..." required></textarea>
                     </div>
 
                     <div class="form-actions span-full">
@@ -112,7 +112,7 @@ $notificacionesLog = $stmtLog->fetchAll(PDO::FETCH_ASSOC);
                         <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Titulo</th>
+                                <th>Título</th>
                                 <th>Canal</th>
                                 <th>Publicado por</th>
                             </tr>
@@ -157,10 +157,10 @@ $notificacionesLog = $stmtLog->fetchAll(PDO::FETCH_ASSOC);
                             <tr>
                                 <th>Fecha</th>
                                 <th>Canal</th>
-                                <th>Titulo</th>
+                                <th>Título</th>
                                 <th>Destinatario</th>
                                 <th>Correo</th>
-                                <th>Telefono</th>
+                                <th>Teléfono</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>

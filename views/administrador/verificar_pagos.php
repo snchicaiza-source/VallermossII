@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/auth_middleware.php';
 require_once __DIR__ . '/../../models/Pago.php';
 
-verificarRol(['ADMINISTRADOR', 'DIRECTIVA']);
+verificarRol(['ADMINISTRADOR']);
 
 $pagoModel = new Pago();
 $pagosPendientes = $pagoModel->obtenerPendientes();
@@ -63,7 +63,7 @@ $pagosPendientes = $pagoModel->obtenerPendientes();
                         <tbody>
                             <?php if (empty($pagosPendientes)): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">No hay transferencias pendientes de revision.</td>
+                                    <td colspan="6" class="text-center">No hay transferencias pendientes de revisión.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($pagosPendientes as $pago): ?>
@@ -78,7 +78,7 @@ $pagosPendientes = $pagoModel->obtenerPendientes();
                                         <td>
                                             <?php $archivo = $pago['comprobante_url'] ?? ''; ?>
                                             <?php if (!empty($archivo)): ?>
-                                                <a href="/VallermossoII/<?= htmlspecialchars($archivo) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <a href="<?= calcularRaizProyecto() ?>/<?= htmlspecialchars($archivo) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-paperclip"></i> Ver
                                                 </a>
                                             <?php else: ?>

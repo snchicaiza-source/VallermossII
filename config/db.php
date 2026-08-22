@@ -1,19 +1,39 @@
 <?php
 
 class Database {
-    private static $host = 'localhost';
-    private static $db_name = 'vallermosso2_db';
-    private static $username = 'root';
-    private static $password = '';
+    // Detecta el entorno: InfinityFree (produccion) o XAMPP local
+    private static $esProduccion = false;
+
+    private static function configurar() {
+        $host_actual = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+        if (strpos($host_actual, 'infinityfreeapp.com') !== false || strpos($host_actual, 'infinityfree.com') !== false) {
+            self::$esProduccion = true;
+        }
+    }
+
     private static $conn = null;
 
     public static function obtenerConexion() {
         if (self::$conn === null) {
+            self::configurar();
+
+            if (self::$esProduccion) {
+                $host = 'sql309.infinityfree.com';
+                $db_name = 'if0_42705605_vallermosso2';
+                $username = 'if0_42705605';
+                $password = 'kfKRCnwWue';
+            } else {
+                $host = 'localhost';
+                $db_name = 'vallermosso2_db';
+                $username = 'root';
+                $password = '';
+            }
+
             try {
                 self::$conn = new PDO(
-                    "mysql:host=" . self::$host . ";dbname=" . self::$db_name . ";charset=utf8mb4",
-                    self::$username,
-                    self::$password,
+                    "mysql:host=" . $host . ";dbname=" . $db_name . ";charset=utf8mb4",
+                    $username,
+                    $password,
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
