@@ -1,0 +1,278 @@
+/* ============================================================
+   TABLAS RESPONSIVAS + BUSCADOR + PAGINACION
+   Conjunto Residencial Vallermosso II
+   ============================================================ */
+
+/* ---------- Barra de filtros / buscador ---------- */
+.tabla-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 18px;
+    margin-bottom: 16px;
+}
+
+/* Grupo = etiqueta visible + control, para que cada filtro se entienda */
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.filtro-grupo > .filtro-etiqueta {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.filtro-grupo .btn {
+    margin-bottom: 1px;
+}
+
+.buscador-tabla {
+    position: relative;
+    width: 280px;
+    max-width: 100%;
+}
+
+.buscador-tabla i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: .85rem;
+    pointer-events: none;
+}
+
+.buscador-tabla input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1.5px solid var(--secondary);
+    border-radius: var(--radius-sm);
+    font-size: .88rem;
+    background: #FDFCFB;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.filtro-grupo .buscador-tabla input {
+    height: 40px;
+}
+
+.buscador-tabla input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(163, 143, 120, 0.15);
+}
+
+.filtro-tabla,
+.filtro-fecha {
+    height: 40px;
+    padding: 9px 32px 9px 12px;
+    border: 1.5px solid var(--secondary);
+    border-radius: var(--radius-sm);
+    font-size: .88rem;
+    background-color: #FDFCFB;
+    color: var(--text-main);
+    cursor: pointer;
+    max-width: 210px;
+}
+
+/* Los inputs de fecha no necesitan el hueco de la flecha del select */
+input[type="date"].filtro-tabla {
+    padding-right: 10px;
+    cursor: text;
+    color: var(--text-main);
+    font-family: inherit;
+}
+
+.filtro-tabla:focus,
+.filtro-fecha:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(163, 143, 120, 0.15);
+}
+
+/* ---------- Info de registros y paginacion ---------- */
+.tabla-info {
+    font-size: .8rem;
+    color: var(--text-muted);
+}
+
+.paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.paginacion-botones {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.pag-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--secondary);
+    background: #FFF;
+    color: var(--text-main);
+    border-radius: var(--radius-sm);
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.pag-btn:hover:not(:disabled):not(.activa) {
+    border-color: var(--primary);
+    color: var(--primary-dark);
+}
+
+.pag-btn.activa {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #FFF;
+}
+
+.pag-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.pag-puntos {
+    color: var(--text-muted);
+    padding: 0 4px;
+}
+
+/* ---------- Contador de caracteres ---------- */
+.contador-caracteres {
+    display: block;
+    text-align: right;
+    font-size: .72rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.contador-caracteres.exedido {
+    color: var(--danger, #B86B61);
+    font-weight: 700;
+}
+
+/* ---------- Mensajes de validacion inline ---------- */
+.campo-error {
+    display: none;
+    font-size: .76rem;
+    color: var(--danger, #B86B61);
+    margin-top: 4px;
+}
+
+.campo-error.visible {
+    display: block;
+}
+
+.form-control.invalido {
+    border-color: var(--danger, #B86B61) !important;
+}
+
+.form-control.valido {
+    border-color: var(--accent, #6E7E65) !important;
+}
+
+/* ============================================================
+   MODO MOVIL: las tablas se convierten en tarjetas apiladas
+   ============================================================ */
+@media (max-width: 720px) {
+
+    .table-responsive {
+        overflow-x: visible;
+    }
+
+    .tabla-movil thead {
+        display: none;
+    }
+
+    .tabla-movil,
+    .tabla-movil tbody,
+    .tabla-movil tr,
+    .tabla-movil td {
+        display: block;
+        width: 100%;
+    }
+
+    .tabla-movil tr {
+        background: #FFF;
+        border: 1px solid var(--secondary);
+        border-radius: var(--radius-sm);
+        margin-bottom: 12px;
+        padding: 6px 0;
+        box-shadow: var(--shadow);
+    }
+
+    .tabla-movil tbody tr:hover {
+        background-color: #FFF;
+    }
+
+    .tabla-movil td {
+        display: flex !important;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 14px;
+        border-bottom: 1px dashed #EEE7DD;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .tabla-movil td:last-child {
+        border-bottom: none;
+    }
+
+    .tabla-movil td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: var(--text-muted);
+        text-align: left;
+        flex-shrink: 0;
+        max-width: 45%;
+        white-space: normal;
+    }
+
+    /* Formularios en una sola columna */
+    .grid-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Filtros apilados y a lo ancho en movil */
+    .tabla-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .tabla-toolbar .filtro-grupo {
+        width: 100%;
+    }
+
+    .filtro-tabla,
+    .filtro-fecha,
+    input[type="date"].filtro-tabla {
+        max-width: 100%;
+        width: 100%;
+    }
+}
